@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\GoogleAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,4 +22,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/ping', function () {
     return response()->json(['message' => 'pong']);
+});
+
+Route::prefix('v1/auth')->name('api.v1.auth.')->group(function () {
+    Route::post('register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+
+    Route::get('google/redirect', [GoogleAuthController::class, 'redirect']);
+    Route::get('google/callback', [GoogleAuthController::class, 'callback']);
+
+    Route::middleware('auth:api')->group(function () {
+        Route::get('me', [AuthController::class, 'me']);
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::post('refresh', [AuthController::class, 'refresh'])->middleware('throttle:10,1');
+    });
 });

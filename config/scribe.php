@@ -102,29 +102,27 @@ return [
 
     // How is your API authenticated? This information will be used in the displayed docs, generated examples and response calls.
     'auth' => [
-        // Set this to true if ANY endpoints in your API use authentication.
-        'enabled' => false,
+        // Enable authentication in docs; secured by default.
+        'enabled' => true,
 
-        // Set this to true if your API should be authenticated by default. If so, you must also set `enabled` (above) to true.
-        // You can then use @unauthenticated or @authenticated on individual endpoints to change their status from the default.
-        'default' => false,
+        // Treat all endpoints as authenticated unless explicitly marked @unauthenticated.
+        'default' => true,
 
-        // Where is the auth value meant to be sent in a request?
+        // Send auth as Bearer token header.
         'in' => AuthIn::BEARER->value,
 
-        // The name of the auth parameter (e.g. token, key, apiKey) or header (e.g. Authorization, Api-Key).
-        'name' => 'key',
+        // Header name for bearer is Authorization (Scribe will prefix "Bearer ").
+        'name' => 'Authorization',
 
-        // The value of the parameter to be used by Scribe to authenticate response calls.
-        // This will NOT be included in the generated documentation. If empty, Scribe will use a random value.
-        'use_value' => env('SCRIBE_AUTH_KEY'),
+        // Token used for response calls (Try It Out examples). Provide a dev token via env.
+        // Do NOT include the "Bearer " prefix; Scribe will add it.
+        'use_value' => env('SCRIBE_AUTH_BEARER'),
 
-        // Placeholder your users will see for the auth parameter in the example requests.
-        // Set this to null if you want Scribe to use a random value as placeholder instead.
-        'placeholder' => '{YOUR_AUTH_KEY}',
+        // Placeholder shown in examples.
+        'placeholder' => '{JWT_TOKEN}',
 
-        // Any extra authentication-related info for your users. Markdown and HTML are supported.
-        'extra_info' => 'You can retrieve your token by visiting your dashboard and clicking <b>Generate API token</b>.',
+        // Extra info shown in docs.
+        'extra_info' => 'Click <b>Authorize</b> and paste your JWT access token. The header will be sent as <code>Authorization: Bearer &lt;token&gt;</code>.',
     ],
 
     // Example requests for each endpoint will be shown in each of these languages.
@@ -232,7 +230,7 @@ return [
         'responses' => configureStrategy(
             Defaults::RESPONSES_STRATEGIES,
             Strategies\Responses\ResponseCalls::withSettings(
-                only: ['GET *'],
+                only: ['GET *', 'POST *'],
                 // Recommended: disable debug mode in response calls to avoid error stack traces in responses
                 config: [
                     'app.debug' => false,
