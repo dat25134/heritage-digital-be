@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Admin\RoleController;
 use App\Http\Controllers\Api\V1\Admin\PermissionController;
 use App\Http\Controllers\Api\V1\Admin\UserRolePermissionController;
 use App\Http\Controllers\Api\V1\Media\EntityMediaController;
+use App\Http\Controllers\Api\V1\ImageIntros\ImageIntroController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +63,14 @@ Route::prefix('v1/admin')->middleware(['auth:api', 'role:admin'])->name('api.v1.
 });
 
 Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function () {
+    // Image Intros
+    Route::get('image-intros', [ImageIntroController::class, 'index'])->middleware(['permission:image-intros.read']);
+    Route::post('image-intros', [ImageIntroController::class, 'store'])->middleware(['permission:image-intros.create']);
+    Route::get('image-intros/{id}', [ImageIntroController::class, 'show'])->middleware(['permission:image-intros.read']);
+    Route::put('image-intros/{id}', [ImageIntroController::class, 'update'])->middleware(['permission:image-intros.update']);
+    Route::delete('image-intros/{id}', [ImageIntroController::class, 'destroy'])->middleware(['permission:image-intros.delete']);
+    Route::post('image-intros/{id}/publish', [ImageIntroController::class, 'publish'])->middleware(['permission:image-intros.update']);
+
     Route::post('{entity}/{id}/media/{collection}', [EntityMediaController::class, 'store'])
         ->middleware(['permission:images.create|images.update']);
     Route::get('{entity}/{id}/media', [EntityMediaController::class, 'index']);
