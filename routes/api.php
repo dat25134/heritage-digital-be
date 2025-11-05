@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Admin\PermissionController;
 use App\Http\Controllers\Api\V1\Admin\UserRolePermissionController;
 use App\Http\Controllers\Api\V1\Media\EntityMediaController;
 use App\Http\Controllers\Api\V1\ImageIntros\ImageIntroController;
+use App\Http\Controllers\Api\V1\Topics\TopicController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +72,19 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     Route::delete('image-intros/{id}', [ImageIntroController::class, 'destroy'])->middleware(['permission:image-intros.delete']);
     Route::post('image-intros/{id}/publish', [ImageIntroController::class, 'publish'])->middleware(['permission:image-intros.update']);
 
+    // Topics
+    Route::get('topics', [TopicController::class, 'index'])->middleware(['permission:topics.read']);
+    Route::post('topics', [TopicController::class, 'store'])->middleware(['permission:topics.create']);
+    Route::get('topics/{id}', [TopicController::class, 'show'])->middleware(['permission:topics.read']);
+    Route::put('topics/{id}', [TopicController::class, 'update'])->middleware(['permission:topics.update']);
+    Route::delete('topics/{id}', [TopicController::class, 'destroy'])->middleware(['permission:topics.delete']);
+
+    Route::get('topics/{id}/media', [TopicController::class, 'listMedia'])->middleware(['permission:topics.read']);
+    Route::post('topics/{id}/media/attach', [TopicController::class, 'attachMedia'])->middleware(['permission:topics.update']);
+    Route::post('topics/{id}/media/detach', [TopicController::class, 'detachMedia'])->middleware(['permission:topics.update']);
+    Route::put('topics/{id}/media/order', [TopicController::class, 'updateMediaOrder'])->middleware(['permission:topics.order']);
+
+    // Generic entity media endpoints (placed after Topics to avoid route conflicts)
     Route::post('{entity}/{id}/media/{collection}', [EntityMediaController::class, 'store'])
         ->middleware(['permission:images.create|images.update']);
     Route::get('{entity}/{id}/media', [EntityMediaController::class, 'index']);

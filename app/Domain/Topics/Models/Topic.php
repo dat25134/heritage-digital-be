@@ -1,38 +1,48 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Domain\Topics\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Illuminate\Support\Str;
 
-class Topic extends Model implements HasMedia
+class Topic extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    use InteractsWithMedia;
 
     protected $table = 'topics';
 
-    public function registerMediaCollections(): void
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+    ];
+
+    protected static function booted(): void
     {
-        $this->addMediaCollection('images');
+        static::creating(function (Topic $topic) {
+            if (!$topic->slug) {
+                $topic->slug = static::uniqueSlug($topic->name);
+            }
+        });
+
+        static::updating(function (Topic $topic) {
+            if ($topic->isDirty('name') && !$topic->isDirty('slug')) {
+                // keep slug if not explicitly changed
+            }
+        });
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public static function uniqueSlug(string $name): string
     {
-        $this->addMediaConversion('thumb')
-            ->fit('crop', 200, 200)
-            ->queued();
-
-        $this->addMediaConversion('sm')->width(640)->queued();
-        $this->addMediaConversion('md')->width(1280)->queued();
-        $this->addMediaConversion('lg')->width(1920)->queued();
+        $base = Str::slug($name);
+        $slug = $base;
+        $i = 1;
+        while (static::withTrashed()->where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i++;
+        }
+        return $slug;
     }
 }
-
-
