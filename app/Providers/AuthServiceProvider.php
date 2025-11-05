@@ -25,5 +25,25 @@ class AuthServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('admin') ? true : null;
         });
+
+        // Define fine-grained gates mapped to spatie permissions
+        $modules = [
+            'images' => ['create', 'read', 'update', 'delete'],
+            'image-intros' => ['create', 'read', 'update', 'delete', 'publish'],
+            'topics' => ['create', 'read', 'update', 'delete', 'order'],
+            'videos' => ['create', 'read', 'update', 'delete', 'upload', 'publish'],
+            'posts' => ['create', 'read', 'update', 'delete', 'publish'],
+            'papers' => ['create', 'read', 'update', 'delete', 'publish'],
+            'backups' => ['read', 'create', 'restore', 'delete'],
+        ];
+
+        foreach ($modules as $module => $actions) {
+            foreach ($actions as $action) {
+                $ability = $module . '.' . $action;
+                Gate::define($ability, function ($user) use ($ability) {
+                    return $user->can($ability);
+                });
+            }
+        }
     }
 }
