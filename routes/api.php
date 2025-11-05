@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\GoogleAuthController;
 use App\Http\Controllers\Api\V1\Admin\RoleController;
 use App\Http\Controllers\Api\V1\Admin\PermissionController;
 use App\Http\Controllers\Api\V1\Admin\UserRolePermissionController;
+use App\Http\Controllers\Api\V1\Media\EntityMediaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,4 +59,12 @@ Route::prefix('v1/admin')->middleware(['auth:api', 'role:admin'])->name('api.v1.
     Route::put('users/{id}/roles', [UserRolePermissionController::class, 'syncRoles']);
     Route::get('users/{id}/permissions', [UserRolePermissionController::class, 'getPermissions']);
     Route::put('users/{id}/permissions', [UserRolePermissionController::class, 'syncPermissions']);
+});
+
+Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function () {
+    Route::post('{entity}/{id}/media/{collection}', [EntityMediaController::class, 'store'])
+        ->middleware(['permission:images.create|images.update']);
+    Route::get('{entity}/{id}/media', [EntityMediaController::class, 'index']);
+    Route::delete('media/{mediaId}', [EntityMediaController::class, 'destroy'])
+        ->middleware(['permission:images.delete']);
 });
