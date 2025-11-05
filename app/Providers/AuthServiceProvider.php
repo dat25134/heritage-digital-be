@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Domain\ImageIntros\Models\ImageIntro;
 use App\Domain\ImageIntros\Policies\ImageIntroPolicy;
+use App\Domain\Topics\Models\Topic;
+use App\Domain\Topics\Policies\TopicPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -16,6 +18,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         ImageIntro::class => ImageIntroPolicy::class,
+        Topic::class => TopicPolicy::class,
     ];
 
     /**
