@@ -10,6 +10,8 @@ use App\Domain\Topics\Models\Topic;
 use App\Domain\Topics\Policies\TopicPolicy;
 use App\Domain\Videos\Models\Video;
 use App\Domain\Videos\Policies\VideoPolicy;
+use App\Domain\Posts\Models\Post;
+use App\Domain\Posts\Policies\PostPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,7 @@ class AuthServiceProvider extends ServiceProvider
         ImageIntro::class => ImageIntroPolicy::class,
         Topic::class => TopicPolicy::class,
         Video::class => VideoPolicy::class,
+            Post::class => PostPolicy::class,
     ];
 
     /**
