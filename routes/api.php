@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\Media\EntityMediaController;
 use App\Http\Controllers\Api\V1\ImageIntros\ImageIntroController;
 use App\Http\Controllers\Api\V1\Topics\TopicController;
 use App\Http\Controllers\Api\V1\Videos\VideoController;
+use App\Http\Controllers\Api\V1\Posts\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,6 +100,14 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     Route::post('videos/{id}/publish', [VideoController::class, 'publish'])->middleware(['permission:videos.publish']);
     Route::post('videos/{id}/thumbnail', [VideoController::class, 'uploadThumbnail'])->middleware(['permission:videos.update']);
     Route::put('videos/order', [VideoController::class, 'updateOrder'])->middleware(['permission:videos.order']);
+
+    // Posts
+    Route::get('posts', [PostController::class, 'index'])->middleware(['permission:posts.read']);
+    Route::post('posts', [PostController::class, 'store'])->middleware(['permission:posts.create']);
+    Route::get('posts/{id}', [PostController::class, 'show'])->middleware(['permission:posts.read']);
+    Route::put('posts/{id}', [PostController::class, 'update'])->middleware(['permission:posts.update']);
+    Route::delete('posts/{id}', [PostController::class, 'destroy'])->middleware(['permission:posts.delete']);
+    Route::post('posts/{id}/publish', [PostController::class, 'publish'])->middleware(['permission:posts.publish']);
 
     // Generic entity media endpoints (placed after Topics to avoid route conflicts)
     Route::post('{entity}/{id}/media/{collection}', [EntityMediaController::class, 'store'])
