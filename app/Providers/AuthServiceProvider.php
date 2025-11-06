@@ -8,6 +8,8 @@ use App\Domain\ImageIntros\Models\ImageIntro;
 use App\Domain\ImageIntros\Policies\ImageIntroPolicy;
 use App\Domain\Topics\Models\Topic;
 use App\Domain\Topics\Policies\TopicPolicy;
+use App\Domain\Videos\Models\Video;
+use App\Domain\Videos\Policies\VideoPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         ImageIntro::class => ImageIntroPolicy::class,
         Topic::class => TopicPolicy::class,
+        Video::class => VideoPolicy::class,
     ];
 
     /**

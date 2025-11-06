@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Domain\Videos\Models;
@@ -17,6 +18,31 @@ class Video extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $table = 'media_videos';
+
+    protected $fillable = [
+        'title',
+        'description',
+        'source_type',
+        'file_path',
+        'external_url',
+        'duration_sec',
+        'width',
+        'height',
+        'size_bytes',
+        'mime',
+        'status',
+        'published_at',
+        'sort_order',
+    ];
+
+    protected $casts = [
+        'published_at' => 'datetime',
+        'duration_sec' => 'integer',
+        'width' => 'integer',
+        'height' => 'integer',
+        'size_bytes' => 'integer',
+        'sort_order' => 'integer',
+    ];
 
     public function registerMediaCollections(): void
     {
