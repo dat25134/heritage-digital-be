@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\GoogleAuthController;
 use App\Http\Controllers\Api\V1\Admin\RoleController;
 use App\Http\Controllers\Api\V1\Admin\PermissionController;
 use App\Http\Controllers\Api\V1\Admin\UserRolePermissionController;
+use App\Http\Controllers\Api\V1\Admin\UserController;
 use App\Http\Controllers\Api\V1\Media\EntityMediaController;
 use App\Http\Controllers\Api\V1\ImageIntros\ImageIntroController;
 use App\Http\Controllers\Api\V1\Topics\TopicController;
@@ -45,6 +46,10 @@ Route::prefix('v1/auth')->name('api.v1.auth.')->group(function () {
 });
 
 Route::prefix('v1/admin')->middleware(['auth:api', 'role:admin'])->name('api.v1.admin.')->group(function () {
+    // Users
+    Route::get('users', [UserController::class, 'index']);
+    Route::get('users/{id}', [UserController::class, 'show']);
+
     // Roles
     Route::get('roles', [RoleController::class, 'index']);
     Route::post('roles', [RoleController::class, 'store']);
