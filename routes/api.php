@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Admin\UserController;
 use App\Http\Controllers\Api\V1\Media\EntityMediaController;
 use App\Http\Controllers\Api\V1\ImageIntros\ImageIntroController;
 use App\Http\Controllers\Api\V1\Topics\TopicController;
+use App\Http\Controllers\Api\V1\Videos\VideoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,6 +90,16 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     Route::post('topics/{id}/media/detach', [TopicController::class, 'detachMedia'])->middleware(['permission:topics.update']);
     Route::put('topics/{id}/media/order', [TopicController::class, 'updateMediaOrder'])->middleware(['permission:topics.order']);
 
+    // Videos
+    Route::get('videos', [VideoController::class, 'index'])->middleware(['permission:videos.read']);
+    Route::post('videos', [VideoController::class, 'store'])->middleware(['permission:videos.create']);
+    Route::get('videos/{id}', [VideoController::class, 'show'])->middleware(['permission:videos.read']);
+    Route::put('videos/{id}', [VideoController::class, 'update'])->middleware(['permission:videos.update']);
+    Route::delete('videos/{id}', [VideoController::class, 'destroy'])->middleware(['permission:videos.delete']);
+    Route::post('videos/{id}/publish', [VideoController::class, 'publish'])->middleware(['permission:videos.publish']);
+    Route::post('videos/{id}/thumbnail', [VideoController::class, 'uploadThumbnail'])->middleware(['permission:videos.update']);
+    Route::put('videos/order', [VideoController::class, 'updateOrder'])->middleware(['permission:videos.order']);
+
     // Generic entity media endpoints (placed after Topics to avoid route conflicts)
     Route::post('{entity}/{id}/media/{collection}', [EntityMediaController::class, 'store'])
         ->middleware(['permission:images.create|images.update']);
@@ -96,3 +107,4 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     Route::delete('media/{mediaId}', [EntityMediaController::class, 'destroy'])
         ->middleware(['permission:images.delete']);
 });
+
