@@ -68,6 +68,8 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                 ],
+                'roles' => $user->roles->pluck('name'),
+                'permissions' => $user->permissions->pluck('name'),
             ],
             'meta' => [
                 'token' => $this->formatToken((string) $token),
