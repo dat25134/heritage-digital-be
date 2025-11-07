@@ -50,6 +50,7 @@ class ImageIntroResource extends JsonResource
                 'cover' => $mediaBlock('cover'),
                 'thumb' => $mediaBlock('thumb'),
                 'avatar' => $mediaBlock('avatar'),
+                'image' => $mediaBlock('image'),
             ],
         ];
     }
