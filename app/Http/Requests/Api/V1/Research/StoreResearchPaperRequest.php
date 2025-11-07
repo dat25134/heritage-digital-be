@@ -30,6 +30,7 @@ class StoreResearchPaperRequest extends FormRequest
             'status' => ['required', Rule::in(['draft', 'published'])],
             'published_at' => ['nullable', 'date'],
             'slug' => ['nullable', 'string', 'alpha_dash', Rule::unique('research_papers', 'slug')],
+            'image_intro_id' => ['nullable', 'integer', 'exists:image_intros,id'],
         ];
     }
 }

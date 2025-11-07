@@ -97,6 +97,8 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     // Videos
     Route::get('videos', [VideoController::class, 'index'])->middleware(['permission:videos.read']);
     Route::post('videos', [VideoController::class, 'store'])->middleware(['permission:videos.create']);
+    Route::get('image-intros/{id}/videos', [VideoController::class, 'indexByIntro'])->middleware(['permission:videos.read']);
+    Route::post('image-intros/{id}/videos', [VideoController::class, 'storeByIntro'])->middleware(['permission:videos.create']);
     Route::get('videos/{id}', [VideoController::class, 'show'])->middleware(['permission:videos.read']);
     Route::put('videos/{id}', [VideoController::class, 'update'])->middleware(['permission:videos.update']);
     Route::delete('videos/{id}', [VideoController::class, 'destroy'])->middleware(['permission:videos.delete']);
@@ -115,6 +117,8 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     // Research Papers
     Route::get('papers', [ResearchPaperController::class, 'index'])->middleware(['permission:papers.read']);
     Route::post('papers', [ResearchPaperController::class, 'store'])->middleware(['permission:papers.create']);
+    Route::get('image-intros/{id}/papers', [ResearchPaperController::class, 'indexByIntro'])->middleware(['permission:papers.read']);
+    Route::post('image-intros/{id}/papers', [ResearchPaperController::class, 'storeByIntro'])->middleware(['permission:papers.create']);
     Route::get('papers/{id}', [ResearchPaperController::class, 'show'])->middleware(['permission:papers.read']);
     Route::put('papers/{id}', [ResearchPaperController::class, 'update'])->middleware(['permission:papers.update']);
     Route::delete('papers/{id}', [ResearchPaperController::class, 'destroy'])->middleware(['permission:papers.delete']);
@@ -123,6 +127,8 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     // Documents
     Route::get('documents', [DocumentController::class, 'index'])->middleware(['permission:documents.read']);
     Route::post('documents', [DocumentController::class, 'store'])->middleware(['permission:documents.create']);
+    Route::get('image-intros/{id}/documents', [DocumentController::class, 'indexByIntro'])->middleware(['permission:documents.read']);
+    Route::post('image-intros/{id}/documents', [DocumentController::class, 'storeByIntro'])->middleware(['permission:documents.create']);
     Route::get('documents/{document}', [DocumentController::class, 'show'])->middleware(['permission:documents.read']);
     Route::put('documents/{document}', [DocumentController::class, 'update'])->middleware(['permission:documents.update']);
     Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->middleware(['permission:documents.delete']);
@@ -132,6 +138,8 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     // Books
     Route::get('books', [BookController::class, 'index'])->middleware(['permission:books.read']);
     Route::post('books', [BookController::class, 'store'])->middleware(['permission:books.create']);
+    Route::get('image-intros/{id}/books', [BookController::class, 'indexByIntro'])->middleware(['permission:books.read']);
+    Route::post('image-intros/{id}/books', [BookController::class, 'storeByIntro'])->middleware(['permission:books.create']);
     Route::get('books/{book}', [BookController::class, 'show'])->middleware(['permission:books.read']);
     Route::put('books/{book}', [BookController::class, 'update'])->middleware(['permission:books.update']);
     Route::delete('books/{book}', [BookController::class, 'destroy'])->middleware(['permission:books.delete']);

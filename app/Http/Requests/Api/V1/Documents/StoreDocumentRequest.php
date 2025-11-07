@@ -20,6 +20,7 @@ class StoreDocumentRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'status' => ['nullable', 'in:draft,published,archived'],
             'published_at' => ['nullable', 'date'],
+            'image_intro_id' => ['nullable', 'integer', 'exists:image_intros,id'],
         ];
     }
 }

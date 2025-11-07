@@ -20,6 +20,7 @@ class CreateDocumentAction
                 'published_at' => $data['published_at'] ?? null,
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $data['image_intro_id'] ?? null,
             ]);
             $document->save();
             return $document;

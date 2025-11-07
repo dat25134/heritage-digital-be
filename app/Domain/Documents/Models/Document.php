@@ -28,6 +28,7 @@ class Document extends Model implements HasMedia
         'published_at',
         'created_by',
         'updated_by',
+        'image_intro_id',
     ];
 
     protected $casts = [
@@ -133,6 +134,11 @@ class Document extends Model implements HasMedia
         $this->addMediaConversion('sm')
             ->width(640)
             ->nonQueued();
+    }
+
+    public function imageIntro()
+    {
+        return $this->belongsTo(\App\Domain\ImageIntros\Models\ImageIntro::class, 'image_intro_id');
     }
 }
 

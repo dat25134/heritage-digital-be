@@ -36,6 +36,10 @@ class ImageIntro extends Model implements HasMedia
         $this->addMediaCollection('cover')->singleFile();
         $this->addMediaCollection('thumb')->singleFile();
         $this->addMediaCollection('avatar')->singleFile();
+        $this->addMediaCollection('images');
+        $this->addMediaCollection('videos');
+        $this->addMediaCollection('audio');
+        $this->addMediaCollection('documents');
     }
 
     public function registerMediaConversions(Media $media = null): void
@@ -72,6 +76,27 @@ class ImageIntro extends Model implements HasMedia
             return $query;
         }
         return $query->where('status', $status);
+    }
+
+    // Relations
+    public function videos()
+    {
+        return $this->hasMany(\App\Domain\Videos\Models\Video::class, 'image_intro_id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(\App\Domain\Documents\Models\Document::class, 'image_intro_id');
+    }
+
+    public function books()
+    {
+        return $this->hasMany(\App\Domain\Books\Models\Book::class, 'image_intro_id');
+    }
+
+    public function papers()
+    {
+        return $this->hasMany(\App\Domain\ResearchPapers\Models\ResearchPaper::class, 'image_intro_id');
     }
 }
 

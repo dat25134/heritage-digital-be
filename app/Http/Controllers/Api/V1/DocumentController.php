@@ -33,6 +33,10 @@ class DocumentController extends Controller
             ->publishedBetween($validated['published_from'] ?? null, $validated['published_to'] ?? null)
             ->createdBetween($validated['created_from'] ?? null, $validated['created_to'] ?? null);
 
+        if (!empty($validated['image_intro_id'])) {
+            $query->where('image_intro_id', (int) $validated['image_intro_id']);
+        }
+
         if (!empty($validated['only_trashed'])) {
             $query->onlyTrashed();
         } elseif (!empty($validated['with_trashed'])) {
@@ -56,6 +60,22 @@ class DocumentController extends Controller
     public function store(StoreDocumentRequest $request, CreateDocumentAction $action): JsonResponse
     {
         $document = $action->handle($request->validated(), $request->user()->id);
+        return (new DocumentResource($document))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    // Intro-scoped helpers
+    public function indexByIntro(DocumentIndexRequest $request, int $imageIntroId): DocumentCollection
+    {
+        $request->merge(['image_intro_id' => $imageIntroId]);
+        return $this->index($request);
+    }
+
+    public function storeByIntro(StoreDocumentRequest $request, int $imageIntroId, CreateDocumentAction $action): JsonResponse
+    {
+        $data = array_merge($request->validated(), ['image_intro_id' => $imageIntroId]);
+        $document = $action->handle($data, $request->user()->id);
         return (new DocumentResource($document))
             ->response()
             ->setStatusCode(201);

@@ -33,6 +33,7 @@ class Book extends Model implements HasMedia
         'published_at',
         'created_by',
         'updated_by',
+        'image_intro_id',
     ];
 
     protected $casts = [
@@ -102,6 +103,11 @@ class Book extends Model implements HasMedia
     public function scopeFilterByStatus(Builder $query, ?string $status): Builder
     {
         return $status ? $query->where('status', $status) : $query;
+    }
+
+    public function imageIntro()
+    {
+        return $this->belongsTo(\App\Domain\ImageIntros\Models\ImageIntro::class, 'image_intro_id');
     }
 }
 

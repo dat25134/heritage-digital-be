@@ -32,6 +32,7 @@ class ResearchPaper extends Model implements HasMedia
         'doi',
         'status',
         'published_at',
+        'image_intro_id',
     ];
 
     protected $casts = [
@@ -93,6 +94,11 @@ class ResearchPaper extends Model implements HasMedia
     public function scopeFilterByDoi(Builder $query, ?string $doi): Builder
     {
         return $doi ? $query->whereRaw('lower(doi) = lower(?)', [$doi]) : $query;
+    }
+
+    public function imageIntro()
+    {
+        return $this->belongsTo(\App\Domain\ImageIntros\Models\ImageIntro::class, 'image_intro_id');
     }
 }
 

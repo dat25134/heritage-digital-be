@@ -33,6 +33,7 @@ class Video extends Model implements HasMedia
         'status',
         'published_at',
         'sort_order',
+        'image_intro_id',
     ];
 
     protected $casts = [
@@ -58,6 +59,11 @@ class Video extends Model implements HasMedia
         $this->addMediaConversion('sm')->width(640)->queued();
         $this->addMediaConversion('md')->width(1280)->queued();
         $this->addMediaConversion('lg')->width(1920)->queued();
+    }
+
+    public function imageIntro()
+    {
+        return $this->belongsTo(\App\Domain\ImageIntros\Models\ImageIntro::class, 'image_intro_id');
     }
 }
 

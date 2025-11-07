@@ -25,6 +25,10 @@ class VideoController extends Controller
 
         $query = Video::query();
 
+        if ($introId = (int) $request->integer('image_intro_id')) {
+            $query->where('image_intro_id', $introId);
+        }
+
         if ($status = $request->string('status')->toString()) {
             $query->where('status', $status);
         }
@@ -84,6 +88,7 @@ class VideoController extends Controller
                 'size_bytes' => $file->getSize() ?: null,
                 'status' => $validated['status'] ?? 'draft',
                 'published_at' => $validated['published_at'] ?? null,
+                'image_intro_id' => (int) $request->integer('image_intro_id') ?: null,
             ]);
             $video->save();
 
@@ -117,6 +122,7 @@ class VideoController extends Controller
                 'external_url' => $validated['external_url'],
                 'status' => $validated['status'] ?? 'draft',
                 'published_at' => $validated['published_at'] ?? null,
+                'image_intro_id' => (int) $request->integer('image_intro_id') ?: null,
             ]);
             $video->save();
 
@@ -138,6 +144,19 @@ class VideoController extends Controller
             'message' => 'Invalid source_type',
             'errors' => [ 'source_type' => ['source_type must be upload or external'] ],
         ], 422);
+    }
+
+    // Intro-scoped helpers
+    public function indexByIntro(Request $request, int $imageIntroId): JsonResponse
+    {
+        $request->merge(['image_intro_id' => $imageIntroId]);
+        return $this->index($request);
+    }
+
+    public function storeByIntro(Request $request, int $imageIntroId): JsonResponse
+    {
+        $request->merge(['image_intro_id' => $imageIntroId]);
+        return $this->store($request);
     }
 
     public function show(int $id): JsonResponse

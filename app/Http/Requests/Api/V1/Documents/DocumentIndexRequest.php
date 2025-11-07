@@ -18,6 +18,7 @@ class DocumentIndexRequest extends FormRequest
         return [
             'q' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', 'in:draft,published,archived'],
+            'image_intro_id' => ['nullable', 'integer', 'exists:image_intros,id'],
             'published_from' => ['nullable', 'date'],
             'published_to' => ['nullable', 'date', 'after_or_equal:published_from'],
             'created_from' => ['nullable', 'date'],
@@ -29,6 +30,14 @@ class DocumentIndexRequest extends FormRequest
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $routeIntroId = $this->route('id') ?? $this->route('imageIntroId');
+        if ($routeIntroId !== null && !$this->has('image_intro_id')) {
+            $this->merge(['image_intro_id' => (int) $routeIntroId]);
+        }
     }
 }
 

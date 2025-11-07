@@ -26,6 +26,7 @@ class StoreBookRequest extends FormRequest
             'page_count' => ['nullable', 'integer', 'min:1', 'max:20000'],
             'status' => ['nullable', 'in:draft,published,archived'],
             'published_at' => ['nullable', 'date'],
+            'image_intro_id' => ['nullable', 'integer', 'exists:image_intros,id'],
         ];
     }
 }

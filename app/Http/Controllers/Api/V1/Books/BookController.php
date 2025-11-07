@@ -34,6 +34,10 @@ class BookController extends Controller
             ->orderBy($sort, $order)
             ->orderBy('id', 'desc');
 
+        if (!empty($validated['image_intro_id'])) {
+            $query->where('image_intro_id', (int) $validated['image_intro_id']);
+        }
+
         $perPage = (int)($validated['per_page'] ?? 15);
         $books = $query->paginate($perPage)->through(fn ($b) => new BookResource($b));
 
@@ -49,6 +53,24 @@ class BookController extends Controller
     public function store(StoreBookRequest $request): JsonResponse
     {
         $data = $request->validated();
+        if (empty($data['slug'])) {
+            $data['slug'] = str($data['title'])->slug()->toString();
+        }
+        $data['created_by'] = $request->user()->id;
+        $book = Book::create($data);
+        return (new BookResource($book))->response()->setStatusCode(201);
+    }
+
+    // Intro-scoped helpers
+    public function indexByIntro(BookIndexRequest $request, int $imageIntroId): BookCollection
+    {
+        $request->merge(['image_intro_id' => $imageIntroId]);
+        return $this->index($request);
+    }
+
+    public function storeByIntro(StoreBookRequest $request, int $imageIntroId): JsonResponse
+    {
+        $data = array_merge($request->validated(), ['image_intro_id' => $imageIntroId]);
         if (empty($data['slug'])) {
             $data['slug'] = str($data['title'])->slug()->toString();
         }

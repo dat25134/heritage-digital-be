@@ -24,6 +24,10 @@ class ResearchPaperController extends Controller
             ->filterByYear($request->integer('year'))
             ->filterByDoi($request->string('doi')->toString());
 
+        if ($introId = (int) $request->integer('image_intro_id')) {
+            $query->where('image_intro_id', $introId);
+        }
+
         if ($request->boolean('published')) {
             $query->published();
         }
@@ -57,6 +61,23 @@ class ResearchPaperController extends Controller
         $data['slug'] = $data['slug'] ?? Str::slug($data['title']);
         $data['slug'] = $this->uniqueSlug($data['slug']);
 
+        $paper = ResearchPaper::create($data);
+        return new ResearchPaperResource($paper);
+    }
+
+    // Intro-scoped helpers
+    public function indexByIntro(Request $request, int $imageIntroId)
+    {
+        $request->merge(['image_intro_id' => $imageIntroId]);
+        return $this->index($request);
+    }
+
+    public function storeByIntro(StoreResearchPaperRequest $request, int $imageIntroId): ResearchPaperResource
+    {
+        $data = array_merge($request->validated(), ['image_intro_id' => $imageIntroId]);
+        // Ensure slug uniqueness or generate from title
+        $data['slug'] = $data['slug'] ?? Str::slug($data['title']);
+        $data['slug'] = $this->uniqueSlug($data['slug']);
         $paper = ResearchPaper::create($data);
         return new ResearchPaperResource($paper);
     }
