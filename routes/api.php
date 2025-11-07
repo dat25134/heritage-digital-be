@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\Topics\TopicController;
 use App\Http\Controllers\Api\V1\Videos\VideoController;
 use App\Http\Controllers\Api\V1\Posts\PostController;
 use App\Http\Controllers\Api\V1\Research\ResearchPaperController;
+use App\Http\Controllers\Api\V1\DocumentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -117,6 +118,15 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     Route::put('papers/{id}', [ResearchPaperController::class, 'update'])->middleware(['permission:papers.update']);
     Route::delete('papers/{id}', [ResearchPaperController::class, 'destroy'])->middleware(['permission:papers.delete']);
     Route::post('papers/{id}/publish', [ResearchPaperController::class, 'publish'])->middleware(['permission:papers.publish']);
+
+    // Documents
+    Route::get('documents', [DocumentController::class, 'index'])->middleware(['permission:documents.read']);
+    Route::post('documents', [DocumentController::class, 'store'])->middleware(['permission:documents.create']);
+    Route::get('documents/{document}', [DocumentController::class, 'show'])->middleware(['permission:documents.read']);
+    Route::put('documents/{document}', [DocumentController::class, 'update'])->middleware(['permission:documents.update']);
+    Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->middleware(['permission:documents.delete']);
+    Route::post('documents/{document}/publish', [DocumentController::class, 'publish'])->middleware(['permission:documents.publish']);
+    Route::post('documents/{document}/unpublish', [DocumentController::class, 'unpublish'])->middleware(['permission:documents.publish']);
 
     // Generic entity media endpoints (placed after Topics to avoid route conflicts)
     Route::post('{entity}/{id}/media/{collection}', [EntityMediaController::class, 'store'])
