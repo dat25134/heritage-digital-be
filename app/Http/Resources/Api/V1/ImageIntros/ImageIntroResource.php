@@ -11,21 +11,29 @@ class ImageIntroResource extends JsonResource
         /** @var \App\Domain\ImageIntros\Models\ImageIntro $intro */
         $intro = $this->resource;
 
-        $mediaBlock = function (string $collection) use ($intro): ?array {
-            $media = $intro->getFirstMedia($collection);
-            if (!$media) {
-                return null;
+        $mediaBlock = function (string $collection) use ($intro): array {
+            $mediaItems = $intro->getMedia($collection);
+            if ($mediaItems->isEmpty()) {
+                return [];
             }
-            return [
-                'id' => $media->id,
-                'url' => $media->getUrl(),
-                'conversions' => [
-                    'thumb' => $media->hasGeneratedConversion('thumb') ? $media->getUrl('thumb') : null,
-                    'sm' => $media->hasGeneratedConversion('sm') ? $media->getUrl('sm') : null,
-                    'md' => $media->hasGeneratedConversion('md') ? $media->getUrl('md') : null,
-                    'lg' => $media->hasGeneratedConversion('lg') ? $media->getUrl('lg') : null,
-                ],
-            ];
+
+            return $mediaItems->map(function ($media) {
+                return [
+                    'id' => $media->id,
+                    'url' => $media->getUrl(),
+                    'file_name' => $media->file_name,
+                    'mime_type' => $media->mime_type,
+                    'size' => $media->size,
+                    'conversions' => [
+                        'thumb' => $media->hasGeneratedConversion('thumb') ? $media->getUrl('thumb') : null,
+                        'sm' => $media->hasGeneratedConversion('sm') ? $media->getUrl('sm') : null,
+                        'md' => $media->hasGeneratedConversion('md') ? $media->getUrl('md') : null,
+                        'lg' => $media->hasGeneratedConversion('lg') ? $media->getUrl('lg') : null,
+                    ],
+                    'custom_properties' => $media->custom_properties,
+                    'created_at' => optional($media->created_at)?->toISOString(),
+                ];
+            })->toArray();
         };
 
         return [
