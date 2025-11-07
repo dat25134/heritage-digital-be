@@ -12,6 +12,8 @@ use App\Domain\Videos\Models\Video;
 use App\Domain\Videos\Policies\VideoPolicy;
 use App\Domain\Posts\Models\Post;
 use App\Domain\Posts\Policies\PostPolicy;
+use App\Domain\ResearchPapers\Models\ResearchPaper;
+use App\Domain\ResearchPapers\Policies\ResearchPaperPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         Topic::class => TopicPolicy::class,
         Video::class => VideoPolicy::class,
             Post::class => PostPolicy::class,
+        ResearchPaper::class => ResearchPaperPolicy::class,
     ];
 
     /**
