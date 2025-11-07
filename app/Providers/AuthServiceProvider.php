@@ -16,6 +16,8 @@ use App\Domain\ResearchPapers\Models\ResearchPaper;
 use App\Domain\ResearchPapers\Policies\ResearchPaperPolicy;
 use App\Domain\Documents\Models\Document;
 use App\Domain\Documents\Policies\DocumentPolicy;
+use App\Domain\Books\Models\Book;
+use App\Domain\Books\Policies\BookPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -31,6 +33,7 @@ class AuthServiceProvider extends ServiceProvider
             Post::class => PostPolicy::class,
         ResearchPaper::class => ResearchPaperPolicy::class,
         Document::class => DocumentPolicy::class,
+        Book::class => BookPolicy::class,
     ];
 
     /**
@@ -53,6 +56,7 @@ class AuthServiceProvider extends ServiceProvider
             'papers' => ['create', 'read', 'update', 'delete', 'publish'],
             'backups' => ['read', 'create', 'restore', 'delete'],
             'documents' => ['create', 'read', 'update', 'delete', 'publish'],
+            'books' => ['create', 'read', 'update', 'delete', 'publish', 'upload'],
         ];
 
         foreach ($modules as $module => $actions) {

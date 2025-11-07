@@ -30,6 +30,10 @@ class PermissionSeeder extends Seeder
             'posts.create', 'posts.read', 'posts.update', 'posts.delete', 'posts.publish',
             // papers
             'papers.create', 'papers.read', 'papers.update', 'papers.delete', 'papers.publish',
+            // documents
+            'documents.create', 'documents.read', 'documents.update', 'documents.delete', 'documents.publish',
+            // books
+            'books.create', 'books.read', 'books.update', 'books.delete', 'books.publish', 'books.upload',
             // backups
             'backups.read', 'backups.create', 'backups.restore', 'backups.delete',
         ];
@@ -53,6 +57,8 @@ class PermissionSeeder extends Seeder
             'image-intros.create', 'image-intros.read', 'image-intros.update', 'image-intros.delete', 'image-intros.publish',
             'posts.create', 'posts.read', 'posts.update', 'posts.delete', 'posts.publish',
             'videos.create', 'videos.read', 'videos.update', 'videos.delete', 'videos.upload', 'videos.publish',
+            'documents.create', 'documents.read', 'documents.update', 'documents.delete', 'documents.publish',
+            'books.create', 'books.read', 'books.update', 'books.delete', 'books.publish', 'books.upload',
         ];
         $editor->syncPermissions(Permission::query()->whereIn('name', $editorPerms)->get());
 
@@ -64,7 +70,7 @@ class PermissionSeeder extends Seeder
         $researcher->syncPermissions(Permission::query()->whereIn('name', $researcherPerms)->get());
 
         $viewerPerms = [
-            'images.read', 'image-intros.read', 'topics.read', 'videos.read', 'posts.read', 'papers.read',
+            'images.read', 'image-intros.read', 'topics.read', 'videos.read', 'posts.read', 'papers.read', 'documents.read', 'books.read',
         ];
         $viewer->syncPermissions(Permission::query()->whereIn('name', $viewerPerms)->get());
     }

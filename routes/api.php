@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\Videos\VideoController;
 use App\Http\Controllers\Api\V1\Posts\PostController;
 use App\Http\Controllers\Api\V1\Research\ResearchPaperController;
 use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\Books\BookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -127,6 +128,16 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->middleware(['permission:documents.delete']);
     Route::post('documents/{document}/publish', [DocumentController::class, 'publish'])->middleware(['permission:documents.publish']);
     Route::post('documents/{document}/unpublish', [DocumentController::class, 'unpublish'])->middleware(['permission:documents.publish']);
+
+    // Books
+    Route::get('books', [BookController::class, 'index'])->middleware(['permission:books.read']);
+    Route::post('books', [BookController::class, 'store'])->middleware(['permission:books.create']);
+    Route::get('books/{book}', [BookController::class, 'show'])->middleware(['permission:books.read']);
+    Route::put('books/{book}', [BookController::class, 'update'])->middleware(['permission:books.update']);
+    Route::delete('books/{book}', [BookController::class, 'destroy'])->middleware(['permission:books.delete']);
+    Route::post('books/{book}/publish', [BookController::class, 'publish'])->middleware(['permission:books.publish']);
+    Route::get('books/{book}/media', [BookController::class, 'listMedia'])->middleware(['permission:books.read']);
+    Route::post('books/{book}/media/{collection}', [BookController::class, 'uploadMedia'])->middleware(['permission:books.upload','throttle:uploads']);
 
     // Generic entity media endpoints (placed after Topics to avoid route conflicts)
     Route::post('{entity}/{id}/media/{collection}', [EntityMediaController::class, 'store'])
