@@ -96,6 +96,7 @@ class ImageIntroResource extends JsonResource
                     'id' => $paper->id,
                     'title' => $paper->title,
                     'slug' => $paper->slug,
+                    'content_html' => $paper->content_html,
                     'abstract' => $paper->abstract,
                     'authors_json' => $paper->authors_json,
                     'year' => $paper->year,
