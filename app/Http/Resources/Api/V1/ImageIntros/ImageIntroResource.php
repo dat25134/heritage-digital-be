@@ -89,6 +89,7 @@ class ImageIntroResource extends JsonResource
                     'published_at' => optional($book->published_at)?->toISOString(),
                     'created_at' => optional($book->created_at)?->toISOString(),
                     'updated_at' => optional($book->updated_at)?->toISOString(),
+                    'pdf_url' => $book->getFirstMedia('books')?->getUrl(),
                 ];
             }),
             'papers' => $intro->papers->map(function ($paper) {
@@ -106,7 +107,6 @@ class ImageIntroResource extends JsonResource
                     'published_at' => optional($paper->published_at)?->toISOString(),
                     'created_at' => optional($paper->created_at)?->toISOString(),
                     'updated_at' => optional($paper->updated_at)?->toISOString(),
-                    'pdf_url' => $paper->getFirstMedia('books')?->getUrl(),
                 ];
             }),
         ];
