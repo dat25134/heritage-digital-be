@@ -62,14 +62,51 @@ class ImageIntroResource extends JsonResource
             'books_count' => $intro->books()->count(),
             'papers_count' => $intro->papers()->count(),
             'videos' => VideoResource::collection($intro->videos),
-            'links' => [
-                'images_list' => url("/api/v1/image-intros/{$intro->id}/media"),
-                'images_upload' => url("/api/v1/image-intros/{$intro->id}/media/images"),
-                'videos' => url("/api/v1/image-intros/{$intro->id}/videos"),
-                'documents' => url("/api/v1/image-intros/{$intro->id}/documents"),
-                'books' => url("/api/v1/image-intros/{$intro->id}/books"),
-                'papers' => url("/api/v1/image-intros/{$intro->id}/papers"),
-            ],
+            'documents' => $intro->documents->map(function ($document) {
+                return [
+                    'id' => $document->id,
+                    'title' => $document->title,
+                    'slug' => $document->slug,
+                    'description' => $document->description,
+                    'status' => $document->status,
+                    'published_at' => optional($document->published_at)?->toISOString(),
+                    'created_at' => optional($document->created_at)?->toISOString(),
+                    'updated_at' => optional($document->updated_at)?->toISOString(),
+                ];
+            }),
+            'books' => $intro->books->map(function ($book) {
+                return [
+                    'id' => $book->id,
+                    'title' => $book->title,
+                    'slug' => $book->slug,
+                    'description' => $book->description,
+                    'author' => $book->author,
+                    'publisher' => $book->publisher,
+                    'published_year' => $book->published_year,
+                    'isbn' => $book->isbn,
+                    'page_count' => $book->page_count,
+                    'status' => $book->status,
+                    'published_at' => optional($book->published_at)?->toISOString(),
+                    'created_at' => optional($book->created_at)?->toISOString(),
+                    'updated_at' => optional($book->updated_at)?->toISOString(),
+                ];
+            }),
+            'papers' => $intro->papers->map(function ($paper) {
+                return [
+                    'id' => $paper->id,
+                    'title' => $paper->title,
+                    'slug' => $paper->slug,
+                    'abstract' => $paper->abstract,
+                    'authors_json' => $paper->authors_json,
+                    'year' => $paper->year,
+                    'journal' => $paper->journal,
+                    'doi' => $paper->doi,
+                    'status' => $paper->status,
+                    'published_at' => optional($paper->published_at)?->toISOString(),
+                    'created_at' => optional($paper->created_at)?->toISOString(),
+                    'updated_at' => optional($paper->updated_at)?->toISOString(),
+                ];
+            }),
         ];
     }
 }

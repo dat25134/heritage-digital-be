@@ -18,7 +18,7 @@ class ImageIntroController extends Controller
         $this->authorize('viewAny', ImageIntro::class);
 
         $query = ImageIntro::query()
-            ->with('videos')
+            ->with(['videos', 'documents', 'books', 'papers'])
             ->when($request->boolean('published', null), fn ($q, $published) => $published ? $q->published() : $q)
             ->search($request->string('q')->toString())
             ->status($request->string('status')->toString());
@@ -47,6 +47,7 @@ class ImageIntroController extends Controller
 
         $data = $request->validated();
         $intro = ImageIntro::query()->create($data);
+        $intro->load(['videos', 'documents', 'books', 'papers']);
 
         return (new ImageIntroResource($intro))
             ->additional(['message' => 'Created', 'errors' => null]);
@@ -54,7 +55,7 @@ class ImageIntroController extends Controller
 
     public function show(int $id)
     {
-        $intro = ImageIntro::query()->with('videos')->findOrFail($id);
+        $intro = ImageIntro::query()->with(['videos', 'documents', 'books', 'papers'])->findOrFail($id);
         $this->authorize('view', $intro);
 
         return (new ImageIntroResource($intro))
@@ -63,11 +64,12 @@ class ImageIntroController extends Controller
 
     public function update(UpdateImageIntroRequest $request, int $id)
     {
-        $intro = ImageIntro::query()->with('videos')->findOrFail($id);
+        $intro = ImageIntro::query()->with(['videos', 'documents', 'books', 'papers'])->findOrFail($id);
         $this->authorize('update', $intro);
 
         $intro->fill($request->validated());
         $intro->save();
+        $intro->load(['videos', 'documents', 'books', 'papers']);
 
         return (new ImageIntroResource($intro))
             ->additional(['message' => 'Updated', 'errors' => null]);
@@ -84,7 +86,7 @@ class ImageIntroController extends Controller
 
     public function publish(PublishImageIntroRequest $request, int $id)
     {
-        $intro = ImageIntro::query()->with('videos')->findOrFail($id);
+        $intro = ImageIntro::query()->with(['videos', 'documents', 'books', 'papers'])->findOrFail($id);
         $this->authorize('update', $intro);
 
         $status = $request->string('status')->toString();
@@ -95,6 +97,7 @@ class ImageIntroController extends Controller
             $intro->published_at = null;
         }
         $intro->save();
+        $intro->load(['videos', 'documents', 'books', 'papers']);
 
         return (new ImageIntroResource($intro))
             ->additional(['message' => 'Publish status updated', 'errors' => null]);
