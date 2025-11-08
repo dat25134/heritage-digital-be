@@ -72,6 +72,7 @@ class ImageIntroResource extends JsonResource
                     'published_at' => optional($document->published_at)?->toISOString(),
                     'created_at' => optional($document->created_at)?->toISOString(),
                     'updated_at' => optional($document->updated_at)?->toISOString(),
+                    'pdf_url' => $document->getFirstMedia('documents')?->getUrl(),
                 ];
             }),
             'books' => $intro->books->map(function ($book) {
