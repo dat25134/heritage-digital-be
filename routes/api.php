@@ -145,7 +145,7 @@ Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function (
     Route::delete('books/{book}', [BookController::class, 'destroy'])->middleware(['permission:books.delete']);
     Route::post('books/{book}/publish', [BookController::class, 'publish'])->middleware(['permission:books.publish']);
     Route::get('books/{book}/media', [BookController::class, 'listMedia'])->middleware(['permission:books.read']);
-    Route::post('books/{book}/media/{collection}', [BookController::class, 'uploadMedia'])->middleware(['permission:books.upload','throttle:uploads']);
+    //Route::post('books/{book}/media/{collection}', [BookController::class, 'uploadMedia'])->middleware(['permission:books.upload','throttle:uploads']);
 
     // Generic entity media endpoints (placed after Topics to avoid route conflicts)
     Route::post('{entity}/{id}/media/{collection}', [EntityMediaController::class, 'store'])
