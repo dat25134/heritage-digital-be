@@ -15,11 +15,11 @@ return new class extends Migration {
             $table->string('slug')->unique();
             $table->text('abstract')->nullable();
             $table->longText('content_html')->nullable();
-            $table->json('authors_json');
-            $table->unsignedSmallInteger('year')->index();
+            $table->json('authors_json')->nullable();
+            $table->unsignedSmallInteger('year')->index()->nullable();
             $table->string('journal')->nullable();
             $table->string('doi', 191)->nullable()->unique();
-            $table->string('status')->index();
+            $table->string('status')->index()->nullable();
             $table->timestamp('published_at')->nullable()->index();
             $table->timestamps();
             $table->softDeletes();
