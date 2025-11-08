@@ -52,7 +52,7 @@ class UploadMediaRequest extends FormRequest
                 'audio/ogg',
                 'audio/webm',
             ],
-            'documents' | 'books' => [
+            'documents' => [
                 'application/pdf',
                 'application/msword',
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -65,6 +65,15 @@ class UploadMediaRequest extends FormRequest
                 'image/png',
                 'image/webp',
                 'image/avif',
+            ],
+            'books' => [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.oasis.opendocument.text',
+                'text/plain',
             ],
             default => [
                 'image/jpeg',
