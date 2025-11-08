@@ -13,9 +13,11 @@ use App\Http\Resources\Videos\VideoResource;
 use App\Jobs\ProcessUploadedVideo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\File;
+use Throwable;
 
 class VideoController extends Controller
 {
@@ -57,93 +59,108 @@ class VideoController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $this->authorize('create', Video::class);
+        try {
+            $this->authorize('create', Video::class);
 
-        $sourceType = $request->input('source_type');
+            $sourceType = $request->input('source_type');
 
-        if ($sourceType === 'upload') {
-            $maxSizeMb = (int) (config('media.video_max_mb', 512));
-            $validated = $request->validate([
-                'title' => ['required', 'string', 'max:255'],
-                'description' => ['nullable', 'string'],
-                'source_type' => ['required', 'in:upload'],
-                'video' => ['required', File::types(['video/*'])->max($maxSizeMb * 1024)],
-                'status' => ['nullable', 'in:draft,published,archived'],
-                'published_at' => ['nullable', 'date'],
-            ]);
+            if ($sourceType === 'upload') {
+                $maxSizeMb = (int) (config('media.video_max_mb', 512));
+                $validated = $request->validate([
+                    'title' => ['required', 'string', 'max:255'],
+                    'description' => ['nullable', 'string'],
+                    'source_type' => ['required', 'in:upload'],
+                    'video' => ['required', File::types(['video/*'])->max($maxSizeMb * 1024)],
+                    'status' => ['nullable', 'in:draft,published,archived'],
+                    'published_at' => ['nullable', 'date'],
+                ]);
 
-            $file = $request->file('video');
-            $now = now();
-            $dir = 'videos/' . $now->format('Y') . '/' . $now->format('m');
-            $filename = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs($dir, $filename, 'public');
+                $file = $request->file('video');
+                $now = now();
+                $dir = 'videos/' . $now->format('Y') . '/' . $now->format('m');
+                $filename = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs($dir, $filename, 'public');
 
-            $video = new Video();
-            $video->fill([
-                'title' => $validated['title'],
-                'description' => $validated['description'] ?? null,
-                'source_type' => 'upload',
-                'file_path' => $path,
-                'mime' => $file->getMimeType() ?: null,
-                'size_bytes' => $file->getSize() ?: null,
-                'status' => $validated['status'] ?? 'draft',
-                'published_at' => $validated['published_at'] ?? null,
-                'image_intro_id' => (int) $request->integer('image_intro_id') ?: null,
-            ]);
-            $video->save();
+                $video = new Video();
+                $video->fill([
+                    'title' => $validated['title'],
+                    'description' => $validated['description'] ?? null,
+                    'source_type' => 'upload',
+                    'file_path' => $path,
+                    'mime' => $file->getMimeType() ?: null,
+                    'size_bytes' => $file->getSize() ?: null,
+                    'status' => $validated['status'] ?? 'draft',
+                    'published_at' => $validated['published_at'] ?? null,
+                    'image_intro_id' => (int) $request->integer('image_intro_id') ?: null,
+                ]);
+                $video->save();
 
-            dispatch(new ProcessUploadedVideo($video->id));
+                dispatch(new ProcessUploadedVideo($video->id));
 
-            return response()->json([
-                'data' => VideoResource::make($video),
-                'meta' => (object) [],
-                'message' => 'Video created (upload)'
-                , 'errors' => null,
-            ], 201);
-        }
+                return response()->json([
+                    'data' => VideoResource::make($video),
+                    'meta' => (object) [],
+                    'message' => 'Video created (upload)',
+                    'errors' => null,
+                ], 201);
+            }
 
-        if ($sourceType === 'external') {
-            $maxThumbMb = (int) (config('media.thumbnail_max_mb', 10));
-            $validated = $request->validate([
-                'title' => ['required', 'string', 'max:255'],
-                'description' => ['nullable', 'string'],
-                'source_type' => ['required', 'in:external'],
-                'external_url' => ['required', 'url'],
-                'thumbnail' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:' . ($maxThumbMb * 1024)],
-                'status' => ['nullable', 'in:draft,published,archived'],
-                'published_at' => ['nullable', 'date'],
-            ]);
+            if ($sourceType === 'external') {
+                $maxThumbMb = (int) (config('media.thumbnail_max_mb', 10));
+                $validated = $request->validate([
+                    'title' => ['required', 'string', 'max:255'],
+                    'description' => ['nullable', 'string'],
+                    'source_type' => ['required', 'in:external'],
+                    'external_url' => ['required', 'url'],
+                    'thumbnail' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp', 'max:' . ($maxThumbMb * 1024)],
+                    'status' => ['nullable', 'in:draft,published,archived'],
+                    'published_at' => ['nullable', 'date'],
+                ]);
 
-            $video = new Video();
-            $video->fill([
-                'title' => $validated['title'],
-                'description' => $validated['description'] ?? null,
-                'source_type' => 'external',
-                'external_url' => $validated['external_url'],
-                'status' => $validated['status'] ?? 'draft',
-                'published_at' => $validated['published_at'] ?? null,
-                'image_intro_id' => (int) $request->integer('image_intro_id') ?: null,
-            ]);
-            $video->save();
+                $video = new Video();
+                $video->fill([
+                    'title' => $validated['title'],
+                    'description' => $validated['description'] ?? null,
+                    'source_type' => 'external',
+                    'external_url' => $validated['external_url'],
+                    'status' => $validated['status'] ?? 'draft',
+                    'published_at' => $validated['published_at'] ?? null,
+                    'image_intro_id' => (int) $request->integer('image_intro_id') ?: null,
+                ]);
+                $video->save();
 
-            if ($request->hasFile('thumbnail')) {
-                $video->addMediaFromRequest('thumbnail')->toMediaCollection('thumbnail');
+                if ($request->hasFile('thumbnail')) {
+                    $video->addMediaFromRequest('thumbnail')->toMediaCollection('thumbnail');
+                }
+
+                return response()->json([
+                    'data' => VideoResource::make($video),
+                    'meta' => (object) [],
+                    'message' => 'Video created (external)',
+                    'errors' => null,
+                ], 201);
             }
 
             return response()->json([
-                'data' => VideoResource::make($video),
+                'data' => (object) [],
                 'meta' => (object) [],
-                'message' => 'Video created (external)',
-                'errors' => null,
-            ], 201);
-        }
+                'message' => 'Invalid source_type',
+                'errors' => ['source_type' => ['source_type must be upload or external']],
+            ], 422);
+        } catch (Throwable $e) {
+            Log::error('Video creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->except(['video', 'thumbnail']),
+            ]);
 
-        return response()->json([
-            'data' => (object) [],
-            'meta' => (object) [],
-            'message' => 'Invalid source_type',
-            'errors' => [ 'source_type' => ['source_type must be upload or external'] ],
-        ], 422);
+            return response()->json([
+                'data' => (object) [],
+                'meta' => (object) [],
+                'message' => 'Failed to create video',
+                'errors' => ['general' => ['An error occurred while creating the video. Please try again.']],
+            ], 500);
+        }
     }
 
     // Intro-scoped helpers
