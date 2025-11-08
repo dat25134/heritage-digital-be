@@ -52,7 +52,7 @@ class UploadMediaRequest extends FormRequest
                 'audio/ogg',
                 'audio/webm',
             ],
-            'documents' => [
+            'documents' | 'books' => [
                 'application/pdf',
                 'application/msword',
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
