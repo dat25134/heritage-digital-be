@@ -18,6 +18,7 @@ class ImageIntroController extends Controller
         $this->authorize('viewAny', ImageIntro::class);
 
         $query = ImageIntro::query()
+            ->with('videos')
             ->when($request->boolean('published', null), fn ($q, $published) => $published ? $q->published() : $q)
             ->search($request->string('q')->toString())
             ->status($request->string('status')->toString());
@@ -53,7 +54,7 @@ class ImageIntroController extends Controller
 
     public function show(int $id)
     {
-        $intro = ImageIntro::query()->findOrFail($id);
+        $intro = ImageIntro::query()->with('videos')->findOrFail($id);
         $this->authorize('view', $intro);
 
         return (new ImageIntroResource($intro))
@@ -62,7 +63,7 @@ class ImageIntroController extends Controller
 
     public function update(UpdateImageIntroRequest $request, int $id)
     {
-        $intro = ImageIntro::query()->findOrFail($id);
+        $intro = ImageIntro::query()->with('videos')->findOrFail($id);
         $this->authorize('update', $intro);
 
         $intro->fill($request->validated());
@@ -83,7 +84,7 @@ class ImageIntroController extends Controller
 
     public function publish(PublishImageIntroRequest $request, int $id)
     {
-        $intro = ImageIntro::query()->findOrFail($id);
+        $intro = ImageIntro::query()->with('videos')->findOrFail($id);
         $this->authorize('update', $intro);
 
         $status = $request->string('status')->toString();

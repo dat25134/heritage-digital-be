@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1\ImageIntros;
 
+use App\Http\Resources\Videos\VideoResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ImageIntroResource extends JsonResource
@@ -60,6 +61,7 @@ class ImageIntroResource extends JsonResource
             'documents_count' => $intro->documents()->count(),
             'books_count' => $intro->books()->count(),
             'papers_count' => $intro->papers()->count(),
+            'videos' => VideoResource::collection($intro->videos),
             'links' => [
                 'images_list' => url("/api/v1/image-intros/{$intro->id}/media"),
                 'images_upload' => url("/api/v1/image-intros/{$intro->id}/media/images"),
