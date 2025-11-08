@@ -21,7 +21,7 @@ class StoreResearchPaperRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'abstract' => ['nullable', 'string'],
             'content_html' => ['nullable', 'string'],
-            'authors_json' => ['required', 'array'],
+            'authors_json' => ['nullable', 'array'],
             'authors_json.*.name' => ['required', 'string', 'max:255'],
             'authors_json.*.affiliation' => ['nullable', 'string', 'max:255'],
             'year' => ['required', 'integer', 'min:1900', 'max:'.$currentYear],
