@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Domain\Documents\Models\Document;
+use App\Domain\ImageIntros\Models\ImageIntro;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -15,6 +16,16 @@ class DocumentSeeder extends Seeder
         $user = User::query()->where('email', 'editor@example.com')->first();
         $userId = $user ? $user->id : null;
 
+        // Get image intros for linking
+        $danCaKhmer = ImageIntro::where('slug', 'di-san-van-hoa-dan-ca-khmer-nam-bo')->first();
+        $danVuKhmer = ImageIntro::where('slug', 'nghe-thuat-dan-vu-khmer')->first();
+        $danNhacKhmer = ImageIntro::where('slug', 'dan-nhac-ngu-am-pin-peat')->first();
+        $leHoiKhmer = ImageIntro::where('slug', 'le-hoi-chol-chnam-thmay')->first();
+        $danCaHoa = ImageIntro::where('slug', 'van-hoa-dan-ca-dan-nhac-nguoi-hoa')->first();
+        $danVuHoa = ImageIntro::where('slug', 'mua-lan-su-rong-nguoi-hoa')->first();
+        $leHoiHoa = ImageIntro::where('slug', 'tet-nguyen-dan-nguoi-hoa')->first();
+        $baoTon = ImageIntro::where('slug', 'bao-ton-va-phat-huy-di-san-van-hoa')->first();
+
         $documents = [
             [
                 'title' => 'Nghiên cứu về Dân ca Khmer Nam Bộ',
@@ -23,6 +34,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(15),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $danCaKhmer?->id,
             ],
             [
                 'title' => 'Bảo tồn và Phát huy Dân vũ Khmer',
@@ -31,6 +43,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(14),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $danVuKhmer?->id,
             ],
             [
                 'title' => 'Nhạc cụ truyền thống Khmer - Dàn nhạc Ngũ âm',
@@ -39,6 +52,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(13),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $danNhacKhmer?->id,
             ],
             [
                 'title' => 'Lễ hội Chol Chnam Thmay - Văn hóa và Nghi lễ',
@@ -47,6 +61,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(12),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $leHoiKhmer?->id,
             ],
             [
                 'title' => 'Dân ca Hoa - Hát Tiều và Hát Quảng',
@@ -55,6 +70,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(11),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $danCaHoa?->id,
             ],
             [
                 'title' => 'Múa Lân Sư Rồng - Nghệ thuật múa truyền thống Hoa',
@@ -63,6 +79,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(10),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $danVuHoa?->id,
             ],
             [
                 'title' => 'Nhạc cụ truyền thống Hoa - Đàn Nhị và Đàn Tranh',
@@ -71,6 +88,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(9),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $danCaHoa?->id,
             ],
             [
                 'title' => 'Tết Nguyên Đán của người Hoa - Phong tục và Văn hóa',
@@ -79,6 +97,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(8),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $leHoiHoa?->id,
             ],
             [
                 'title' => 'Bảo tồn Di sản Văn hóa Dân tộc Thiểu số',
@@ -87,6 +106,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(7),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $baoTon?->id,
             ],
             [
                 'title' => 'Nghệ nhân và Nghệ sĩ - Gìn giữ Di sản Văn hóa',
@@ -95,6 +115,7 @@ class DocumentSeeder extends Seeder
                 'published_at' => now()->subDays(6),
                 'created_by' => $userId,
                 'updated_by' => $userId,
+                'image_intro_id' => $baoTon?->id,
             ],
         ];
 

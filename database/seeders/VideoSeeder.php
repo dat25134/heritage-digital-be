@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Domain\ImageIntros\Models\ImageIntro;
 use App\Domain\Videos\Models\Video;
 use Illuminate\Database\Seeder;
 
@@ -11,6 +12,15 @@ class VideoSeeder extends Seeder
 {
     public function run(): void
     {
+        // Get image intros for linking
+        $danCaKhmer = ImageIntro::where('slug', 'di-san-van-hoa-dan-ca-khmer-nam-bo')->first();
+        $danVuKhmer = ImageIntro::where('slug', 'nghe-thuat-dan-vu-khmer')->first();
+        $danNhacKhmer = ImageIntro::where('slug', 'dan-nhac-ngu-am-pin-peat')->first();
+        $danCaHoa = ImageIntro::where('slug', 'van-hoa-dan-ca-dan-nhac-nguoi-hoa')->first();
+        $danVuHoa = ImageIntro::where('slug', 'mua-lan-su-rong-nguoi-hoa')->first();
+        $leHoiKhmer = ImageIntro::where('slug', 'le-hoi-chol-chnam-thmay')->first();
+        $leHoiHoa = ImageIntro::where('slug', 'tet-nguyen-dan-nguoi-hoa')->first();
+
         $videos = [
             // Videos về Dân ca Khmer
             [
@@ -21,6 +31,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(10),
                 'sort_order' => 1,
+                'image_intro_id' => $danCaKhmer?->id,
             ],
             [
                 'title' => 'Hát Rô Băm - Vở kịch múa cổ điển Khmer',
@@ -30,6 +41,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(9),
                 'sort_order' => 2,
+                'image_intro_id' => $danCaKhmer?->id,
             ],
             [
                 'title' => 'Chầm Riêng Chà Pây - Độc tấu đàn truyền thống',
@@ -39,6 +51,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(8),
                 'sort_order' => 3,
+                'image_intro_id' => $danCaKhmer?->id,
             ],
             // Videos về Dân vũ Khmer
             [
@@ -49,6 +62,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(7),
                 'sort_order' => 4,
+                'image_intro_id' => $danVuKhmer?->id,
             ],
             [
                 'title' => 'Múa Rom Vong - Điệu múa vòng tròn Khmer',
@@ -58,6 +72,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(6),
                 'sort_order' => 5,
+                'image_intro_id' => $danVuKhmer?->id,
             ],
             [
                 'title' => 'Múa trống Chhay Dăm - Điệu múa nam Khmer',
@@ -67,6 +82,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(5),
                 'sort_order' => 6,
+                'image_intro_id' => $danVuKhmer?->id,
             ],
             [
                 'title' => 'Múa Salavan - Điệu múa cổ điển Khmer',
@@ -76,6 +92,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(4),
                 'sort_order' => 7,
+                'image_intro_id' => $danVuKhmer?->id,
             ],
             // Videos về Dân nhạc Khmer
             [
@@ -86,6 +103,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(3),
                 'sort_order' => 8,
+                'image_intro_id' => $danNhacKhmer?->id,
             ],
             [
                 'title' => 'Nhạc cụ Roneat - Đàn gõ tre Khmer',
@@ -95,6 +113,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(2),
                 'sort_order' => 9,
+                'image_intro_id' => $danNhacKhmer?->id,
             ],
             // Videos về Dân ca Hoa
             [
@@ -105,6 +124,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(11),
                 'sort_order' => 10,
+                'image_intro_id' => $danCaHoa?->id,
             ],
             [
                 'title' => 'Hát Quảng - Dòng nhạc dân gian Hoa Quảng Đông',
@@ -114,6 +134,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(10),
                 'sort_order' => 11,
+                'image_intro_id' => $danCaHoa?->id,
             ],
             // Videos về Dân vũ Hoa
             [
@@ -124,6 +145,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(1),
                 'sort_order' => 12,
+                'image_intro_id' => $danVuHoa?->id,
             ],
             [
                 'title' => 'Múa Rồng - Biểu tượng may mắn của người Hoa',
@@ -133,6 +155,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now(),
                 'sort_order' => 13,
+                'image_intro_id' => $danVuHoa?->id,
             ],
             [
                 'title' => 'Múa Sư Tử - Điệu múa linh vật của người Hoa',
@@ -142,6 +165,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subHours(6),
                 'sort_order' => 14,
+                'image_intro_id' => $danVuHoa?->id,
             ],
             // Videos về Dân nhạc Hoa
             [
@@ -152,6 +176,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subHours(12),
                 'sort_order' => 15,
+                'image_intro_id' => $danCaHoa?->id,
             ],
             [
                 'title' => 'Đàn Tranh - Nhạc cụ gõ dây truyền thống Hoa',
@@ -161,6 +186,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subHours(8),
                 'sort_order' => 16,
+                'image_intro_id' => $danCaHoa?->id,
             ],
             // Videos về Lễ hội
             [
@@ -171,6 +197,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(12),
                 'sort_order' => 17,
+                'image_intro_id' => $leHoiKhmer?->id,
             ],
             [
                 'title' => 'Tết Nguyên Đán của người Hoa - Lễ hội truyền thống',
@@ -180,6 +207,7 @@ class VideoSeeder extends Seeder
                 'status' => 'published',
                 'published_at' => now()->subDays(13),
                 'sort_order' => 18,
+                'image_intro_id' => $leHoiHoa?->id,
             ],
         ];
 
