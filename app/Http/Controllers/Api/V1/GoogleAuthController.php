@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
 /** @var \Tymon\JWTAuth\JWTGuard auth */
@@ -59,6 +60,31 @@ class GoogleAuthController extends Controller
         $guard = auth('api');
         $token = $guard->login($user);
 
+        // Use Spatie's efficient methods to get roles and permissions
+        // getRoleNames() returns a collection of role names directly (more efficient)
+        $roles = $user->getRoleNames();
+        
+        // Get permissions efficiently by querying only the name column directly from database
+        // This avoids loading full permission objects and relationships into memory
+        // Query both direct permissions and permissions from roles
+        $directPermissions = DB::table('permissions')
+            ->join('model_has_permissions', 'permissions.id', '=', 'model_has_permissions.permission_id')
+            ->where('model_has_permissions.model_type', User::class)
+            ->where('model_has_permissions.model_id', $user->id)
+            ->select('permissions.name')
+            ->pluck('name');
+        
+        $rolePermissions = DB::table('permissions')
+            ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
+            ->join('model_has_roles', 'role_has_permissions.role_id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_type', User::class)
+            ->where('model_has_roles.model_id', $user->id)
+            ->select('permissions.name')
+            ->pluck('name');
+        
+        // Merge and get unique permission names
+        $permissions = $directPermissions->merge($rolePermissions)->unique()->values();
+
         return response()->json([
             'data' => [
                 'user' => [
@@ -66,8 +92,8 @@ class GoogleAuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                 ],
-                'roles' => $user->roles->pluck('name'),
-                'permissions' => $user->permissions->pluck('name'),
+                'roles' => $roles,
+                'permissions' => $permissions,
             ],
             'meta' => [
                 'token' => $this->formatToken((string) $token),
