@@ -1,5 +1,22 @@
 <?php
 
+// Calculate allowed origins
+$corsOrigins = array_filter([
+    env('FRONTEND_URL'),
+    ...explode(',', env('CORS_ALLOWED_ORIGINS', '')),
+]);
+
+$supportsCredentials = env('CORS_SUPPORTS_CREDENTIALS', true);
+
+// If supports_credentials is true, we cannot use wildcard '*'
+// Return specific origins or empty array (which will be handled by middleware)
+if ($supportsCredentials && !empty($corsOrigins)) {
+    $allowedOrigins = $corsOrigins;
+} else {
+    // If no specific origins and credentials disabled, allow all
+    $allowedOrigins = empty($corsOrigins) ? ['*'] : $corsOrigins;
+}
+
 return [
 
     /*
@@ -19,16 +36,31 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => $allowedOrigins,
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => [
+        'Accept',
+        'Authorization',
+        'Content-Type',
+        'X-Requested-With',
+        'X-CSRF-TOKEN',
+        'X-XSRF-TOKEN',
+        'Origin',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers',
+    ],
 
-    'exposed_headers' => [],
+    'exposed_headers' => [
+        'Authorization',
+        'X-Total-Count',
+        'X-Page',
+        'X-Per-Page',
+    ],
 
-    'max_age' => 0,
+    'max_age' => env('CORS_MAX_AGE', 86400),
 
-    'supports_credentials' => false,
+    'supports_credentials' => $supportsCredentials,
 
 ];
