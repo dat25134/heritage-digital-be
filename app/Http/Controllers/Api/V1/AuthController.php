@@ -9,6 +9,7 @@ use App\Http\Requests\Auth\AuthLoginRequest;
 use App\Http\Requests\Auth\AuthRegisterRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 /** @var \Tymon\JWTAuth\JWTGuard auth */
 
@@ -24,9 +25,37 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
+        // Automatically assign 'viewer' role to new users
+        $user->assignRole('viewer');
+
         /** @var \Tymon\JWTAuth\JWTGuard $guard */
         $guard = auth('api');
         $token = $guard->login($user);
+
+        // Get roles and permissions efficiently
+        $roles = DB::table('roles')
+            ->join('model_has_roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_type', User::class)
+            ->where('model_has_roles.model_id', $user->id)
+            ->select('roles.name')
+            ->pluck('name');
+
+        $directPermissions = DB::table('permissions')
+            ->join('model_has_permissions', 'permissions.id', '=', 'model_has_permissions.permission_id')
+            ->where('model_has_permissions.model_type', User::class)
+            ->where('model_has_permissions.model_id', $user->id)
+            ->select('permissions.name')
+            ->pluck('name');
+
+        $rolePermissions = DB::table('permissions')
+            ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
+            ->join('model_has_roles', 'role_has_permissions.role_id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_type', User::class)
+            ->where('model_has_roles.model_id', $user->id)
+            ->select('permissions.name')
+            ->pluck('name');
+
+        $permissions = $directPermissions->merge($rolePermissions)->unique()->values();
 
         return response()->json([
             'data' => [
@@ -35,6 +64,8 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                 ],
+                'roles' => $roles,
+                'permissions' => $permissions,
             ],
             'meta' => [
                 'token' => $this->formatToken($token),

@@ -56,6 +56,8 @@ class GoogleAuthController extends Controller
             ]);
             // Refresh user to ensure it's properly loaded from database
             $user->refresh();
+            // Automatically assign 'viewer' role to new users
+            $user->assignRole('viewer');
         }
 
         /** @var \Tymon\JWTAuth\JWTGuard $guard */
