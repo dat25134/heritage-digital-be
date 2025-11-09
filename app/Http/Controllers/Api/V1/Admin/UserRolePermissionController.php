@@ -42,15 +42,25 @@ class UserRolePermissionController extends Controller
     public function syncPermissions(Request $request, int $userId): JsonResponse
     {
         $data = $request->validate([
-            'permissions' => ['required', 'array'],
+            'permissions' => ['present', 'array'],
             'permissions.*' => ['string'],
         ]);
 
         $user = User::query()->findOrFail($userId);
-        $perms = Permission::query()->whereIn('name', $data['permissions'])->where('guard_name', 'api')->get();
-        $user->syncPermissions($perms);
+        
+        // If permissions array is empty, syncPermissions will remove all permissions
+        // If permissions array has values, it will sync to only those permissions
+        if (empty($data['permissions'])) {
+            $user->syncPermissions([]);
+        } else {
+            $perms = Permission::query()
+                ->whereIn('name', $data['permissions'])
+                ->where('guard_name', 'api')
+                ->get();
+            $user->syncPermissions($perms);
+        }
 
-        return response()->json(['data' => $user->permissions, 'meta' => new \stdClass(), 'message' => 'Permissions synced', 'errors' => null]);
+        return response()->json(['data' => $user->fresh()->permissions, 'meta' => new \stdClass(), 'message' => 'Permissions synced', 'errors' => null]);
     }
 }
 

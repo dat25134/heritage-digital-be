@@ -66,16 +66,23 @@ class RoleController extends Controller
     public function updatePermissions(Request $request, int $id): JsonResponse
     {
         $data = $request->validate([
-            'permissions' => ['required', 'array'],
+            'permissions' => ['present', 'array'],
             'permissions.*' => ['string'],
         ]);
 
         $role = Role::query()->findOrFail($id);
-        $perms = Permission::query()
-            ->whereIn('name', $data['permissions'])
-            ->where('guard_name', $role->guard_name)
-            ->get();
-        $role->syncPermissions($perms);
+        
+        // If permissions array is empty, syncPermissions will remove all permissions from the role
+        // If permissions array has values, it will sync to only those permissions
+        if (empty($data['permissions'])) {
+            $role->syncPermissions([]);
+        } else {
+            $perms = Permission::query()
+                ->whereIn('name', $data['permissions'])
+                ->where('guard_name', $role->guard_name)
+                ->get();
+            $role->syncPermissions($perms);
+        }
 
         return response()->json(['data' => $role->load('permissions'), 'meta' => new \stdClass(), 'message' => 'Permissions synced', 'errors' => null]);
     }
