@@ -66,17 +66,24 @@ class GoogleAuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                 ],
+                'roles' => $user->roles->pluck('name'),
+                'permissions' => $user->permissions->pluck('name'),
             ],
             'meta' => [
-                'token' => [
-                    'access_token' => $token,
-                    'token_type' => 'bearer',
-                    'expires_in' => (int) config('jwt.ttl', 60) * 60,
-                ],
+                'token' => $this->formatToken((string) $token),
             ],
             'message' => 'Google login successful',
             'errors' => null,
         ]);
+    }
+
+    private function formatToken(string $token): array
+    {
+        return [
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => (int) config('jwt.ttl', 60) * 60,
+        ];
     }
 }
 
