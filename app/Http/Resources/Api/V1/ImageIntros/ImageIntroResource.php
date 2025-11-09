@@ -12,8 +12,15 @@ class ImageIntroResource extends JsonResource
         /** @var \App\Domain\ImageIntros\Models\ImageIntro $intro */
         $intro = $this->resource;
 
-        $mediaBlock = function (string $collection) use ($intro): array {
-            $mediaItems = $intro->getMedia($collection);
+        // Cache all media collections to avoid multiple queries
+        $mediaCache = [];
+        $collections = ['cover', 'thumb', 'avatar', 'images', 'videos', 'audio', 'documents'];
+        foreach ($collections as $collection) {
+            $mediaCache[$collection] = $intro->getMedia($collection);
+        }
+
+        $mediaBlock = function (string $collection) use ($mediaCache): array {
+            $mediaItems = $mediaCache[$collection] ?? collect();
             if ($mediaItems->isEmpty()) {
                 return [];
             }
@@ -37,6 +44,18 @@ class ImageIntroResource extends JsonResource
             })->toArray();
         };
 
+        // Use loaded relationships to avoid additional queries
+        $videos = $intro->relationLoaded('videos') ? $intro->videos : collect();
+        $documents = $intro->relationLoaded('documents') ? $intro->documents : collect();
+        $books = $intro->relationLoaded('books') ? $intro->books : collect();
+        $papers = $intro->relationLoaded('papers') ? $intro->papers : collect();
+
+        // Limit collections to prevent memory issues (max 50 items per collection)
+        $videosLimited = $videos->take(50);
+        $documentsLimited = $documents->take(50);
+        $booksLimited = $books->take(50);
+        $papersLimited = $papers->take(50);
+
         return [
             'id' => $intro->id,
             'title' => $intro->title,
@@ -56,13 +75,18 @@ class ImageIntroResource extends JsonResource
                 'audio' => $mediaBlock('audio'),
                 'documents' => $mediaBlock('documents'),
             ],
-            'images_count' => $intro->getMedia('images')->count(),
-            'videos_count' => $intro->videos()->count(),
-            'documents_count' => $intro->documents()->count(),
-            'books_count' => $intro->books()->count(),
-            'papers_count' => $intro->papers()->count(),
-            'videos' => VideoResource::collection($intro->videos),
-            'documents' => $intro->documents->map(function ($document) {
+            'images_count' => $mediaCache['images']->count(),
+            'videos_count' => $videos->count(),
+            'documents_count' => $documents->count(),
+            'books_count' => $books->count(),
+            'papers_count' => $papers->count(),
+            'videos' => VideoResource::collection($videosLimited),
+            'documents' => $documentsLimited->map(function ($document) {
+                // Use loaded media if available, otherwise query
+                $firstMedia = $document->relationLoaded('media') 
+                    ? $document->media->where('collection_name', 'documents')->first()
+                    : $document->getFirstMedia('documents');
+                
                 return [
                     'id' => $document->id,
                     'title' => $document->title,
@@ -72,10 +96,15 @@ class ImageIntroResource extends JsonResource
                     'published_at' => optional($document->published_at)?->toISOString(),
                     'created_at' => optional($document->created_at)?->toISOString(),
                     'updated_at' => optional($document->updated_at)?->toISOString(),
-                    'pdf_url' => $document->getFirstMedia('documents')?->getUrl(),
+                    'pdf_url' => $firstMedia?->getUrl(),
                 ];
             }),
-            'books' => $intro->books->map(function ($book) {
+            'books' => $booksLimited->map(function ($book) {
+                // Use loaded media if available, otherwise query
+                $firstMedia = $book->relationLoaded('media')
+                    ? $book->media->where('collection_name', 'books')->first()
+                    : $book->getFirstMedia('books');
+                
                 return [
                     'id' => $book->id,
                     'title' => $book->title,
@@ -90,10 +119,10 @@ class ImageIntroResource extends JsonResource
                     'published_at' => optional($book->published_at)?->toISOString(),
                     'created_at' => optional($book->created_at)?->toISOString(),
                     'updated_at' => optional($book->updated_at)?->toISOString(),
-                    'pdf_url' => $book->getFirstMedia('books')?->getUrl(),
+                    'pdf_url' => $firstMedia?->getUrl(),
                 ];
             }),
-            'papers' => $intro->papers->map(function ($paper) {
+            'papers' => $papersLimited->map(function ($paper) {
                 return [
                     'id' => $paper->id,
                     'title' => $paper->title,

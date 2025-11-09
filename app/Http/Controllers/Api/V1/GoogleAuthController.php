@@ -60,9 +60,14 @@ class GoogleAuthController extends Controller
         $guard = auth('api');
         $token = $guard->login($user);
 
-        // Use Spatie's efficient methods to get roles and permissions
-        // getRoleNames() returns a collection of role names directly (more efficient)
-        $roles = $user->getRoleNames();
+        // Get roles efficiently by querying only the name column directly from database
+        // This avoids loading full role objects and relationships into memory
+        $roles = DB::table('roles')
+            ->join('model_has_roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_type', User::class)
+            ->where('model_has_roles.model_id', $user->id)
+            ->select('roles.name')
+            ->pluck('name');
         
         // Get permissions efficiently by querying only the name column directly from database
         // This avoids loading full permission objects and relationships into memory

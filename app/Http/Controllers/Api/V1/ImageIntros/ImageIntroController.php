@@ -18,7 +18,12 @@ class ImageIntroController extends Controller
         $this->authorize('viewAny', ImageIntro::class);
 
         $query = ImageIntro::query()
-            ->with(['videos', 'documents', 'books', 'papers'])
+            ->with([
+                'videos',
+                'documents.media', // Eager load media to avoid N+1 queries
+                'books.media', // Eager load media to avoid N+1 queries
+                'papers',
+            ])
             ->when($request->boolean('published', null), fn ($q, $published) => $published ? $q->published() : $q)
             ->search($request->string('q')->toString())
             ->status($request->string('status')->toString());
