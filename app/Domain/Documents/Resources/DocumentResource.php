@@ -24,6 +24,7 @@ class DocumentResource extends JsonResource
             'published_at' => optional($this->published_at)?->toISOString(),
             'created_at' => optional($this->created_at)?->toISOString(),
             'updated_at' => optional($this->updated_at)?->toISOString(),
+            'pdf_url' => $pdf?->getUrl(),
             'media' => [
                 'pdf' => $pdf ? [
                     'id' => $pdf->id,
