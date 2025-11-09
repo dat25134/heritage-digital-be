@@ -37,14 +37,27 @@ class ResearchPaperController extends Controller
 
         // Sorting
         $sort = $request->string('sort')->toString() ?: '-published_at,-id';
+        $order = $request->string('order')->toString();
+        
+        // Use order parameter if provided, otherwise use sort prefix
+        $defaultDirection = null;
+        if ($order !== null && in_array(strtolower($order), ['asc', 'desc'], true)) {
+            $defaultDirection = strtolower($order);
+        }
+        
         foreach (explode(',', $sort) as $sortField) {
             $sortField = trim($sortField);
             if ($sortField === '') {
                 continue;
             }
-            $direction = Str::startsWith($sortField, '-') ? 'desc' : 'asc';
             $column = ltrim($sortField, '-');
             if (in_array($column, ['id', 'year', 'published_at', 'created_at'], true)) {
+                // Use order parameter if provided, otherwise use sort prefix
+                if ($defaultDirection !== null) {
+                    $direction = $defaultDirection;
+                } else {
+                    $direction = Str::startsWith($sortField, '-') ? 'desc' : 'asc';
+                }
                 $query->orderBy($column, $direction);
             }
         }

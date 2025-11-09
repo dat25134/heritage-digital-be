@@ -32,13 +32,24 @@ class UserController extends Controller
 
         // Sorting
         $sort = $request->string('sort', '-id')->toString();
-        $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
+        $order = $request->string('order')->toString();
         $column = ltrim($sort, '-');
 
         if (in_array($column, ['id', 'name', 'email', 'created_at', 'updated_at'])) {
+            // Use order parameter if provided, otherwise use sort prefix
+            if ($order !== null && in_array(strtolower($order), ['asc', 'desc'], true)) {
+                $direction = strtolower($order);
+            } else {
+                $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
+            }
             $query->orderBy($column, $direction);
         } else {
-            $query->orderByDesc('id');
+            // If no valid sort column, use order parameter or default to desc
+            if ($order !== null && in_array(strtolower($order), ['asc', 'desc'], true)) {
+                $query->orderBy('id', strtolower($order));
+            } else {
+                $query->orderByDesc('id');
+            }
         }
 
         $users = $query->paginate($request->integer('per_page', 15));

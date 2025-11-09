@@ -14,7 +14,28 @@ class RoleController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $roles = Role::query()->paginate((int) $request->get('per_page', 15));
+        $query = Role::query();
+        
+        // Sorting
+        $sort = $request->string('sort')->toString() ?: 'id';
+        $order = $request->string('order')->toString();
+        $column = ltrim($sort, '-');
+        
+        // Use order parameter if provided, otherwise use sort prefix
+        if ($order !== null && in_array(strtolower($order), ['asc', 'desc'], true)) {
+            $direction = strtolower($order);
+        } else {
+            $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
+        }
+        
+        $allowed = ['id', 'name', 'guard_name', 'created_at', 'updated_at'];
+        if (in_array($column, $allowed, true)) {
+            $query->orderBy($column, $direction);
+        } else {
+            $query->orderBy('id', $direction);
+        }
+        
+        $roles = $query->paginate((int) $request->get('per_page', 15));
         return response()->json(['data' => $roles, 'meta' => ['pagination' => $roles->toArray()], 'message' => '', 'errors' => null]);
     }
 

@@ -30,12 +30,25 @@ class ImageIntroController extends Controller
 
         // sort
         $sort = $request->string('sort')->toString();
+        $order = $request->string('order')->toString();
+        
         if ($sort) {
-            $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
             $column = ltrim($sort, '-');
+            // Use order parameter if provided, otherwise use sort prefix
+            if ($order !== null && in_array(strtolower($order), ['asc', 'desc'], true)) {
+                $direction = strtolower($order);
+            } else {
+                $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
+            }
             $query->orderBy($column, $direction);
         } else {
-            $query->orderByDesc('published_at')->orderByDesc('id');
+            // If no sort specified, use order parameter or default to desc
+            if ($order !== null && in_array(strtolower($order), ['asc', 'desc'], true)) {
+                $direction = strtolower($order);
+                $query->orderBy('published_at', $direction)->orderBy('id', $direction);
+            } else {
+                $query->orderByDesc('published_at')->orderByDesc('id');
+            }
         }
 
         $intros = $query->paginate($request->integer('per_page', 15));

@@ -44,7 +44,8 @@ class PostController extends Controller
         }
 
         $sort = $request->string('sort')->toString() ?: '-published_at';
-        $this->applySort($query, $sort);
+        $order = $request->string('order')->toString();
+        $this->applySort($query, $sort, $order);
 
         $perPage = max(1, (int) $request->integer('per_page', 15));
         $paginator = $query->paginate($perPage);
@@ -198,15 +199,20 @@ class PostController extends Controller
         ]);
     }
 
-    private function applySort($query, string $sort): void
+    private function applySort($query, string $sort, ?string $order = null): void
     {
-        $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
         $column = ltrim($sort, '-');
 
         $allowed = ['published_at', 'created_at', 'title'];
         if (!in_array($column, $allowed, true)) {
             $column = 'published_at';
-            $direction = 'desc';
+        }
+
+        // Use order parameter if provided, otherwise use sort prefix
+        if ($order !== null && in_array(strtolower($order), ['asc', 'desc'], true)) {
+            $direction = strtolower($order);
+        } else {
+            $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
         }
 
         $query->orderBy($column, $direction);

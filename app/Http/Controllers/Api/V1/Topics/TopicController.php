@@ -32,12 +32,24 @@ class TopicController extends Controller
             });
 
         $sort = $request->string('sort')->toString();
+        $order = $request->string('order')->toString();
+        
         if ($sort) {
-            $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
             $column = ltrim($sort, '-');
+            // Use order parameter if provided, otherwise use sort prefix
+            if ($order !== null && in_array(strtolower($order), ['asc', 'desc'], true)) {
+                $direction = strtolower($order);
+            } else {
+                $direction = str_starts_with($sort, '-') ? 'desc' : 'asc';
+            }
             $query->orderBy($column, $direction);
         } else {
-            $query->orderByDesc('id');
+            // If no sort specified, use order parameter or default to desc
+            if ($order !== null && in_array(strtolower($order), ['asc', 'desc'], true)) {
+                $query->orderBy('id', strtolower($order));
+            } else {
+                $query->orderByDesc('id');
+            }
         }
 
         $topics = $query->paginate($request->integer('per_page', 15));
