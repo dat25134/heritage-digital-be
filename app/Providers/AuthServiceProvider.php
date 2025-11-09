@@ -45,7 +45,12 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Allow admin to bypass all checks
+        // Eager load roles to avoid N+1 queries when checking permissions
         Gate::before(function ($user, $ability) {
+            // Load roles once if not already loaded to prevent multiple queries
+            if (!$user->relationLoaded('roles')) {
+                $user->load('roles');
+            }
             return $user->hasRole('admin') ? true : null;
         });
 
@@ -66,7 +71,16 @@ class AuthServiceProvider extends ServiceProvider
             foreach ($actions as $action) {
                 $ability = $module . '.' . $action;
                 Gate::define($ability, function ($user) use ($ability) {
-                    return $user->can($ability);
+                    // Eager load roles and permissions to avoid N+1 queries
+                    if (!$user->relationLoaded('roles')) {
+                        $user->load('roles');
+                    }
+                    if (!$user->relationLoaded('permissions')) {
+                        $user->load('permissions');
+                    }
+                    // Use hasPermissionTo() directly to avoid infinite recursion with can()
+                    // hasPermissionTo() checks Spatie Permission directly without going through Gate
+                    return $user->hasPermissionTo($ability, 'api');
                 });
             }
         }
