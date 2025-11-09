@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1\ImageIntros;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreImageIntroRequest extends FormRequest
 {
@@ -15,7 +16,7 @@ class StoreImageIntroRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:image_intros,slug'],
+            'slug' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('image_intros', 'slug')->whereNull('deleted_at')],
             'summary' => ['nullable', 'string'],
             'content_html' => ['nullable', 'string'],
             'status' => ['required', 'in:draft,published'],

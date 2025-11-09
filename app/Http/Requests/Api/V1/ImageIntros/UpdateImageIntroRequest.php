@@ -18,7 +18,7 @@ class UpdateImageIntroRequest extends FormRequest
 
         return [
             'title' => ['sometimes', 'required', 'string', 'max:255'],
-            'slug' => ['sometimes', 'required', 'string', 'max:255', 'alpha_dash', Rule::unique('image_intros', 'slug')->ignore($id)],
+            'slug' => ['sometimes', 'required', 'string', 'max:255', 'alpha_dash', Rule::unique('image_intros', 'slug')->ignore($id)->whereNull('deleted_at')],
             'summary' => ['nullable', 'string'],
             'content_html' => ['nullable', 'string'],
             'status' => ['sometimes', 'required', 'in:draft,published'],
