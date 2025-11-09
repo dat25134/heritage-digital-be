@@ -85,8 +85,8 @@ class ResearchPaperController extends Controller
     public function show(string $idOrSlug): ResearchPaperResource
     {
         $paper = is_numeric($idOrSlug)
-            ? ResearchPaper::findOrFail((int) $idOrSlug)
-            : ResearchPaper::where('slug', $idOrSlug)->firstOrFail();
+            ? ResearchPaper::with('media')->findOrFail((int) $idOrSlug)
+            : ResearchPaper::with('media')->where('slug', $idOrSlug)->firstOrFail();
 
         return new ResearchPaperResource($paper);
     }

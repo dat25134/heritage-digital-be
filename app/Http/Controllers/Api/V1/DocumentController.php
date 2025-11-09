@@ -54,6 +54,7 @@ class DocumentController extends Controller
     public function show(Document $document): DocumentResource
     {
         $this->authorize('view', $document);
+        $document->load('media');
         return new DocumentResource($document);
     }
 

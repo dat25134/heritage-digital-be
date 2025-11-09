@@ -47,6 +47,7 @@ class BookController extends Controller
     public function show(Book $book): BookResource
     {
         $this->authorize('view', $book);
+        $book->load('media');
         return new BookResource($book);
     }
 

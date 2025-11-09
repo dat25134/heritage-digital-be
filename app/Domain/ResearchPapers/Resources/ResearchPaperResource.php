@@ -15,7 +15,10 @@ class ResearchPaperResource extends JsonResource
         $paper = $this->resource;
 
         // Load all media once and group by collection to avoid N+1 queries
-        $allMedia = $paper->getMedia();
+        // Use relationship if eager loaded, otherwise load it
+        $allMedia = $paper->relationLoaded('media') 
+            ? $paper->getRelation('media') 
+            : $paper->getMedia();
         $mediaByCollection = $allMedia->groupBy('collection_name');
 
         $formatMedia = function ($media) {
