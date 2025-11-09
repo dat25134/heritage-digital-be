@@ -15,6 +15,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             UserSeeder::class,
+            TopicSeeder::class,
+            PostSeeder::class,
+            VideoSeeder::class,
+            DocumentSeeder::class,
+            BookSeeder::class,
+            ResearchPaperSeeder::class,
         ]);
     }
 }
