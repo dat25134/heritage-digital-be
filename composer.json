@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.8",
+        "php-ffmpeg/php-ffmpeg": "^1.2",
         "php-open-source-saver/jwt-auth": "^2.8",
         "spatie/laravel-backup": "^8.0",
         "spatie/laravel-medialibrary": "^10.12",
