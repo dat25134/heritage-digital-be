@@ -54,41 +54,81 @@ class GoogleAuthController extends Controller
                 'provider_id' => $providerId,
                 'avatar_path' => $avatar,
             ]);
+            // Refresh user to ensure it's properly loaded from database
+            $user->refresh();
         }
 
         /** @var \Tymon\JWTAuth\JWTGuard $guard */
         $guard = auth('api');
         $token = $guard->login($user);
 
-        // Get roles efficiently by querying only the name column directly from database
-        // This avoids loading full role objects and relationships into memory
-        $roles = DB::table('roles')
-            ->join('model_has_roles', 'roles.id', '=', 'model_has_roles.role_id')
-            ->where('model_has_roles.model_type', User::class)
-            ->where('model_has_roles.model_id', $user->id)
-            ->select('roles.name')
-            ->pluck('name');
-        
-        // Get permissions efficiently by querying only the name column directly from database
-        // This avoids loading full permission objects and relationships into memory
-        // Query both direct permissions and permissions from roles
-        $directPermissions = DB::table('permissions')
-            ->join('model_has_permissions', 'permissions.id', '=', 'model_has_permissions.permission_id')
-            ->where('model_has_permissions.model_type', User::class)
-            ->where('model_has_permissions.model_id', $user->id)
-            ->select('permissions.name')
-            ->pluck('name');
-        
-        $rolePermissions = DB::table('permissions')
-            ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
-            ->join('model_has_roles', 'role_has_permissions.role_id', '=', 'model_has_roles.role_id')
-            ->where('model_has_roles.model_type', User::class)
-            ->where('model_has_roles.model_id', $user->id)
-            ->select('permissions.name')
-            ->pluck('name');
-        
-        // Merge and get unique permission names
-        $permissions = $directPermissions->merge($rolePermissions)->unique()->values();
+        // Initialize empty collections for roles and permissions
+        $roles = collect();
+        $permissions = collect();
+
+        // Only query if user has been saved to database (has an ID)
+        // For new users without roles, return empty collections immediately
+        if ($user->id) {
+            // Quick check: if user has any roles or direct permissions
+            // Use a single query to check both to minimize database calls
+            $userHasRolesOrPermissions = DB::table('model_has_roles')
+                ->where('model_type', User::class)
+                ->where('model_id', $user->id)
+                ->exists() || DB::table('model_has_permissions')
+                ->where('model_type', User::class)
+                ->where('model_id', $user->id)
+                ->exists();
+
+            // Only query if user actually has roles or permissions
+            if ($userHasRolesOrPermissions) {
+                // Check if user has any roles
+                $hasRoles = DB::table('model_has_roles')
+                    ->where('model_type', User::class)
+                    ->where('model_id', $user->id)
+                    ->exists();
+
+                // Get roles efficiently by querying only the name column directly from database
+                if ($hasRoles) {
+                    $roles = DB::table('roles')
+                        ->join('model_has_roles', 'roles.id', '=', 'model_has_roles.role_id')
+                        ->where('model_has_roles.model_type', User::class)
+                        ->where('model_has_roles.model_id', $user->id)
+                        ->select('roles.name')
+                        ->pluck('name');
+                }
+
+                // Get direct permissions (only if user has direct permissions)
+                $hasDirectPermissions = DB::table('model_has_permissions')
+                    ->where('model_type', User::class)
+                    ->where('model_id', $user->id)
+                    ->exists();
+
+                $directPermissions = collect();
+                if ($hasDirectPermissions) {
+                    $directPermissions = DB::table('permissions')
+                        ->join('model_has_permissions', 'permissions.id', '=', 'model_has_permissions.permission_id')
+                        ->where('model_has_permissions.model_type', User::class)
+                        ->where('model_has_permissions.model_id', $user->id)
+                        ->select('permissions.name')
+                        ->pluck('name');
+                }
+
+                // Get permissions from roles (only if user has roles)
+                $rolePermissions = collect();
+                if ($hasRoles) {
+                    $rolePermissions = DB::table('permissions')
+                        ->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
+                        ->join('model_has_roles', 'role_has_permissions.role_id', '=', 'model_has_roles.role_id')
+                        ->where('model_has_roles.model_type', User::class)
+                        ->where('model_has_roles.model_id', $user->id)
+                        ->select('permissions.name')
+                        ->pluck('name');
+                }
+
+                // Merge and get unique permission names
+                $permissions = $directPermissions->merge($rolePermissions)->unique()->values();
+            }
+        }
 
         return response()->json([
             'data' => [
