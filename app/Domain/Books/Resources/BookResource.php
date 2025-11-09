@@ -11,9 +11,30 @@ class BookResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $cover = $this->getFirstMedia('cover');
-        $ebook = $this->getFirstMedia('ebook');
-        $attachments = $this->getMedia('attachments');
+        $mediaBlock = function (string $collection): array {
+            $mediaItems = $this->getMedia($collection);
+            if ($mediaItems->isEmpty()) {
+                return [];
+            }
+
+            return $mediaItems->map(function ($media) {
+                return [
+                    'id' => $media->id,
+                    'url' => $media->getUrl(),
+                    'file_name' => $media->file_name,
+                    'mime_type' => $media->mime_type,
+                    'size' => $media->size,
+                    'conversions' => [
+                        'thumb' => $media->hasGeneratedConversion('thumb') ? $media->getUrl('thumb') : null,
+                        'sm' => $media->hasGeneratedConversion('sm') ? $media->getUrl('sm') : null,
+                        'md' => $media->hasGeneratedConversion('md') ? $media->getUrl('md') : null,
+                        'lg' => $media->hasGeneratedConversion('lg') ? $media->getUrl('lg') : null,
+                    ],
+                    'custom_properties' => $media->custom_properties,
+                    'created_at' => optional($media->created_at)?->toISOString(),
+                ];
+            })->toArray();
+        };
 
         return [
             'id' => $this->id,
@@ -30,29 +51,13 @@ class BookResource extends JsonResource
             'created_at' => optional($this->created_at)?->toISOString(),
             'updated_at' => optional($this->updated_at)?->toISOString(),
             'media' => [
-                'ebook' => $ebook ? [
-                    'id' => $ebook->id,
-                    'url' => $ebook->getUrl(),
-                    'name' => $ebook->file_name,
-                    'size' => $ebook->size,
-                    'mime' => $ebook->mime_type,
-                ] : null,
-                'cover' => $cover ? [
-                    'id' => $cover->id,
-                    'url' => $cover->getUrl(),
-                    'thumb' => $cover->hasGeneratedConversion('thumb') ? $cover->getUrl('thumb') : null,
-                    'sm' => $cover->hasGeneratedConversion('sm') ? $cover->getUrl('sm') : null,
-                    'md' => $cover->hasGeneratedConversion('md') ? $cover->getUrl('md') : null,
-                ] : null,
-                'attachments' => $attachments->map(function ($m) {
-                    return [
-                        'id' => $m->id,
-                        'url' => $m->getUrl(),
-                        'name' => $m->file_name,
-                        'size' => $m->size,
-                        'mime' => $m->mime_type,
-                    ];
-                })->all(),
+                'cover' => $mediaBlock('cover'),
+                'thumb' => $mediaBlock('thumb'),
+                'avatar' => $mediaBlock('avatar'),
+                'images' => $mediaBlock('images'),
+                'videos' => $mediaBlock('videos'),
+                'audio' => $mediaBlock('audio'),
+                'documents' => $mediaBlock('documents'),
             ],
         ];
     }

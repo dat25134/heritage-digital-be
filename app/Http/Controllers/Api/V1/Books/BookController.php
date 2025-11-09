@@ -39,7 +39,7 @@ class BookController extends Controller
         }
 
         $perPage = (int)($validated['per_page'] ?? 15);
-        $books = $query->paginate($perPage)->through(fn ($b) => new BookResource($b));
+        $books = $query->with('media')->paginate($perPage)->through(fn ($b) => new BookResource($b));
 
         return new BookCollection($books);
     }

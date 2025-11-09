@@ -17,6 +17,7 @@ class EntityResolver
             'image-intros' => \App\Domain\ImageIntros\Models\ImageIntro::class,
             'topics' => \App\Domain\Topics\Models\Topic::class,
             'posts' => \App\Domain\Posts\Models\Post::class,
+            'papers' => \App\Domain\ResearchPapers\Models\ResearchPaper::class,
             'research-papers' => \App\Domain\ResearchPapers\Models\ResearchPaper::class,
             'videos' => \App\Domain\Videos\Models\Video::class,
             'documents' => \App\Domain\Documents\Models\Document::class,

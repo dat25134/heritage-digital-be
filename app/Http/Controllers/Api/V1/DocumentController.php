@@ -46,7 +46,7 @@ class DocumentController extends Controller
         $query->orderBy($sort, $order)->orderBy('created_at', 'desc');
 
         $perPage = (int)($validated['per_page'] ?? 15);
-        $documents = $query->paginate($perPage)->through(fn ($doc) => new DocumentResource($doc));
+        $documents = $query->with('media')->paginate($perPage)->through(fn ($doc) => new DocumentResource($doc));
 
         return new DocumentCollection($documents);
     }

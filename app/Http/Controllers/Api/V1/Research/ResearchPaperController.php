@@ -50,7 +50,7 @@ class ResearchPaperController extends Controller
         }
 
         $perPage = (int) max(1, min(100, (int) $request->integer('per_page') ?: 15));
-        $paginator = $query->paginate($perPage)->appends($request->query());
+        $paginator = $query->with('media')->paginate($perPage)->appends($request->query());
         return ResearchPaperResource::collection($paginator);
     }
 

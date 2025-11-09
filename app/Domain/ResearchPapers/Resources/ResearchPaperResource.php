@@ -14,9 +14,30 @@ class ResearchPaperResource extends JsonResource
         /** @var \App\Domain\ResearchPapers\Models\ResearchPaper $paper */
         $paper = $this->resource;
 
-        $cover = $paper->getFirstMedia('cover');
-        $pdf = $paper->getFirstMedia('pdf');
-        $attachments = $paper->getMedia('attachments');
+        $mediaBlock = function (string $collection) use ($paper): array {
+            $mediaItems = $paper->getMedia($collection);
+            if ($mediaItems->isEmpty()) {
+                return [];
+            }
+
+            return $mediaItems->map(function ($media) {
+                return [
+                    'id' => $media->id,
+                    'url' => $media->getUrl(),
+                    'file_name' => $media->file_name,
+                    'mime_type' => $media->mime_type,
+                    'size' => $media->size,
+                    'conversions' => [
+                        'thumb' => $media->hasGeneratedConversion('thumb') ? $media->getUrl('thumb') : null,
+                        'sm' => $media->hasGeneratedConversion('sm') ? $media->getUrl('sm') : null,
+                        'md' => $media->hasGeneratedConversion('md') ? $media->getUrl('md') : null,
+                        'lg' => $media->hasGeneratedConversion('lg') ? $media->getUrl('lg') : null,
+                    ],
+                    'custom_properties' => $media->custom_properties,
+                    'created_at' => optional($media->created_at)?->toISOString(),
+                ];
+            })->toArray();
+        };
 
         return [
             'id' => $paper->id,
@@ -32,23 +53,15 @@ class ResearchPaperResource extends JsonResource
             'published_at' => optional($paper->published_at)?->toISOString(),
             'created_at' => optional($paper->created_at)?->toISOString(),
             'updated_at' => optional($paper->updated_at)?->toISOString(),
-
-            'pdf_url' => $pdf?->getUrl(),
-            'cover_urls' => $cover ? [
-                'original' => $cover->getUrl(),
-                'thumb' => $cover->getUrl('thumb'),
-                'sm' => $cover->getUrl('sm'),
-                'md' => $cover->getUrl('md'),
-                'lg' => $cover->getUrl('lg'),
-            ] : null,
-            'attachments' => $attachments->map(fn ($m) => [
-                'id' => $m->id,
-                'name' => $m->file_name,
-                'url' => $m->getUrl(),
-                'size' => $m->size,
-                'mime' => $m->mime_type,
-                'custom_properties' => $m->custom_properties,
-            ])->all(),
+            'media' => [
+                'cover' => $mediaBlock('cover'),
+                'thumb' => $mediaBlock('thumb'),
+                'avatar' => $mediaBlock('avatar'),
+                'images' => $mediaBlock('images'),
+                'videos' => $mediaBlock('videos'),
+                'audio' => $mediaBlock('audio'),
+                'documents' => $mediaBlock('documents'),
+            ],
         ];
     }
 }
