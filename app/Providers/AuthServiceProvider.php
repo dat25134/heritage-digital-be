@@ -18,6 +18,8 @@ use App\Domain\Documents\Models\Document;
 use App\Domain\Documents\Policies\DocumentPolicy;
 use App\Domain\Books\Models\Book;
 use App\Domain\Books\Policies\BookPolicy;
+use App\Domain\Backup\Models\Backup;
+use App\Domain\Backup\Policies\BackupPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -34,6 +36,7 @@ class AuthServiceProvider extends ServiceProvider
         ResearchPaper::class => ResearchPaperPolicy::class,
         Document::class => DocumentPolicy::class,
         Book::class => BookPolicy::class,
+        Backup::class => BackupPolicy::class,
     ];
 
     /**

@@ -59,6 +59,7 @@ class PermissionSeeder extends Seeder
             'videos.create', 'videos.read', 'videos.update', 'videos.delete', 'videos.upload', 'videos.publish',
             'documents.create', 'documents.read', 'documents.update', 'documents.delete', 'documents.publish',
             'books.create', 'books.read', 'books.update', 'books.delete', 'books.publish', 'books.upload',
+            'backups.read', 'backups.create',
         ];
         $editor->syncPermissions(Permission::query()->whereIn('name', $editorPerms)->get());
 
@@ -71,6 +72,7 @@ class PermissionSeeder extends Seeder
 
         $viewerPerms = [
             'images.read', 'image-intros.read', 'topics.read', 'videos.read', 'posts.read', 'papers.read', 'documents.read', 'books.read',
+            'backups.read',
         ];
         $viewer->syncPermissions(Permission::query()->whereIn('name', $viewerPerms)->get());
     }

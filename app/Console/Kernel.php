@@ -13,6 +13,21 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+
+        // Monthly backup on 1st of month at 4 AM
+        $schedule->call(function () {
+            (new \App\Domain\Backup\Actions\CreateBackupAction())->execute('full', null);
+        })
+            ->monthlyOn(1, '04:00')
+            ->withoutOverlapping()
+            ->onFailure(function () {
+                \Illuminate\Support\Facades\Log::error('Monthly backup job failed');
+            });
+
+        // Cleanup old backups (retention policy)
+        $schedule->command('backup:clean')
+            ->daily()
+            ->at('05:00');
     }
 
     /**

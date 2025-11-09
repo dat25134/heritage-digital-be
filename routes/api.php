@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Admin\RoleController;
 use App\Http\Controllers\Api\V1\Admin\PermissionController;
 use App\Http\Controllers\Api\V1\Admin\UserRolePermissionController;
 use App\Http\Controllers\Api\V1\Admin\UserController;
+use App\Http\Controllers\Api\V1\Admin\BackupController;
 use App\Http\Controllers\Api\V1\Media\EntityMediaController;
 use App\Http\Controllers\Api\V1\ImageIntros\ImageIntroController;
 use App\Http\Controllers\Api\V1\Topics\TopicController;
@@ -71,6 +72,20 @@ Route::prefix('v1/admin')->middleware(['auth:api', 'role:admin'])->name('api.v1.
     Route::put('users/{id}/roles', [UserRolePermissionController::class, 'syncRoles']);
     Route::get('users/{id}/permissions', [UserRolePermissionController::class, 'getPermissions']);
     Route::put('users/{id}/permissions', [UserRolePermissionController::class, 'syncPermissions']);
+
+    // Backups
+    Route::get('backups', [BackupController::class, 'index'])
+        ->middleware(['permission:backups.read']);
+    Route::post('backups', [BackupController::class, 'store'])
+        ->middleware(['permission:backups.create']);
+    Route::get('backups/{id}', [BackupController::class, 'show'])
+        ->middleware(['permission:backups.read']);
+    Route::delete('backups/{id}', [BackupController::class, 'destroy'])
+        ->middleware(['permission:backups.delete']);
+    Route::get('backups/{id}/confirmation-token', [BackupController::class, 'getConfirmationToken'])
+        ->middleware(['permission:backups.restore']);
+    Route::post('backups/{id}/restore', [BackupController::class, 'restore'])
+        ->middleware(['permission:backups.restore', 'throttle:1,60']); // Limit restore to 1 per hour
 });
 
 Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function () {
