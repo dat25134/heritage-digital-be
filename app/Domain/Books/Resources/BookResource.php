@@ -63,6 +63,7 @@ class BookResource extends JsonResource
                 'videos' => $getMediaCollection('videos'),
                 'audio' => $getMediaCollection('audio'),
                 'documents' => $getMediaCollection('documents'),
+                'books' => $getMediaCollection('books'),
             ],
         ];
     }
