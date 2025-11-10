@@ -27,10 +27,10 @@ class UpdateResearchPaperRequest extends FormRequest
             'authors_json.*.affiliation' => ['nullable', 'string', 'max:255'],
             'year' => ['sometimes', 'required', 'integer', 'min:1900', 'max:'.$currentYear],
             'journal' => ['nullable', 'string', 'max:255'],
-            'doi' => ['nullable', 'string', 'max:191', Rule::unique('research_papers', 'doi')->whereNotNull('doi')->ignore($paperId)],
+            'doi' => ['nullable', 'string', 'max:191', Rule::unique('research_papers', 'doi')->whereNotNull('doi')->whereNull('deleted_at')->ignore($paperId)],
             'status' => ['nullable', Rule::in(['draft', 'published'])],
             'published_at' => ['nullable', 'date'],
-            'slug' => ['nullable', 'string', 'alpha_dash', Rule::unique('research_papers', 'slug')->ignore($paperId)],
+            'slug' => ['nullable', 'string', 'alpha_dash', Rule::unique('research_papers', 'slug')->ignore($paperId)->whereNull('deleted_at')],
         ];
     }
 }

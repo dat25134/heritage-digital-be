@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Posts;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePostRequest extends FormRequest
 {
@@ -18,7 +19,7 @@ class UpdatePostRequest extends FormRequest
 
         return [
             'title' => ['sometimes', 'required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'unique:posts,slug,' . $id],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('posts', 'slug')->ignore($id)->whereNull('deleted_at')],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content_html' => ['sometimes', 'required', 'string'],
             'seo_title' => ['nullable', 'string', 'max:255'],

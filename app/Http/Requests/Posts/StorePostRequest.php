@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Posts;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorePostRequest extends FormRequest
 {
@@ -16,7 +17,7 @@ class StorePostRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'unique:posts,slug'],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('posts', 'slug')->whereNull('deleted_at')],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content_html' => ['required', 'string'],
             'seo_title' => ['nullable', 'string', 'max:255'],

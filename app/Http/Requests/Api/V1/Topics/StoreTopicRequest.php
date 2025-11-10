@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1\Topics;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTopicRequest extends FormRequest
 {
@@ -15,7 +16,7 @@ class StoreTopicRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'unique:topics,slug'],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('topics', 'slug')->whereNull('deleted_at')],
             'description' => ['nullable', 'string'],
         ];
     }
