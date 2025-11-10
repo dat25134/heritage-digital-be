@@ -34,7 +34,8 @@ class RestoreBackupAction
         ]);
 
         // Dispatch restore job
-        RestoreBackupJob::dispatch($backup->id, $backup->path, $backup->disk, $userId);
+        RestoreBackupJob::dispatch($backup->id, $backup->path, $backup->disk, $userId)
+            ->onQueue('backups');
 
         return $backup->fresh();
     }
