@@ -15,7 +15,20 @@ class UpdateBookRequest extends FormRequest
 
     public function rules(): array
     {
-        $id = (int) ($this->route('id') ?? $this->route('book'));
+        // Route model binding may pass a Book model instance for 'book'
+        $routeBook = $this->route('book');
+        $routeId = $this->route('id');
+        $id = null;
+        if (is_object($routeBook) && isset($routeBook->id)) {
+            $id = (int) $routeBook->id;
+        } elseif (!is_null($routeId)) {
+            $id = (int) $routeId;
+        } elseif (!is_null($routeBook)) {
+            // In case route('book') is an ID string/number
+            $id = (int) $routeBook;
+        } else {
+            $id = 0;
+        }
 
         return [
             'title' => ['sometimes', 'required', 'string', 'max:255'],
