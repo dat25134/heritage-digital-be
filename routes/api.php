@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Admin\UserController;
 use App\Http\Controllers\Api\V1\Admin\BackupController;
 use App\Http\Controllers\Api\V1\Media\EntityMediaController;
 use App\Http\Controllers\Api\V1\ImageIntros\ImageIntroController;
+use App\Http\Controllers\Api\V1\Categories\CategoryController;
 use App\Http\Controllers\Api\V1\Topics\TopicController;
 use App\Http\Controllers\Api\V1\Videos\VideoController;
 use App\Http\Controllers\Api\V1\Posts\PostController;
@@ -89,6 +90,9 @@ Route::prefix('v1/admin')->middleware(['auth:api', 'role:admin'])->name('api.v1.
 });
 
 Route::prefix('v1')->middleware(['auth:api'])->name('api.v1.')->group(function () {
+    // Categories
+    Route::get('categories', [CategoryController::class, 'index']);
+
     // Image Intros
     Route::get('image-intros', [ImageIntroController::class, 'index'])->middleware(['permission:image-intros.read']);
     Route::post('image-intros', [ImageIntroController::class, 'store'])->middleware(['permission:image-intros.create']);

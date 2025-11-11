@@ -20,6 +20,7 @@ class ImageIntro extends Model implements HasMedia
 
     protected $fillable = [
         'title',
+        'category',
         'slug',
         'summary',
         'content_html',

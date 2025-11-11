@@ -59,6 +59,7 @@ class ImageIntroResource extends JsonResource
         return [
             'id' => $intro->id,
             'title' => $intro->title,
+            'category' => $intro->category,
             'slug' => $intro->slug,
             'summary' => $intro->summary,
             'content_html' => $intro->content_html,
