@@ -15,8 +15,8 @@ class CategorySeeder extends Seeder
         $categories = [
             ['name' => 'Người Khmer', 'slug' => 'nguoi-khmer', 'order' => 1],
             ['name' => 'Người Hoa', 'slug' => 'nguoi-hoa', 'order' => 2],
-            ['name ' => 'Di sản văn hóa phi vật thể', 'slug' => 'bao-ton-di-san-van-hoa-phi-vat-the', 'order' => 3],
-            ['name ' => 'Di sản văn hóa vật thể', 'slug' => 'bao-ton-di-san-van-hoa-vat-the', 'order' => 4],
+            ['name' => 'Di sản văn hóa phi vật thể', 'slug' => 'bao-ton-di-san-van-hoa-phi-vat-the', 'order' => 3],
+            ['name' => 'Di sản văn hóa vật thể', 'slug' => 'bao-ton-di-san-van-hoa-vat-the', 'order' => 4],
         ];
 
         foreach ($categories as $category) {
