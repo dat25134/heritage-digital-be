@@ -178,10 +178,18 @@ class BackupController extends Controller
         $backup = Backup::findOrFail($id);
         $this->authorize('restore', $backup);
 
-        if ($backup->status !== 'completed') {
+        // Allow token generation when status in [completed, restored, restore_failed]; block when restoring
+        if ($backup->status === 'restoring') {
             return response()->json([
                 'data' => null,
-                'message' => 'Can only get confirmation token for completed backups',
+                'message' => 'Restore already in progress for this backup',
+                'errors' => null,
+            ], 409);
+        }
+        if (!in_array($backup->status, ['completed', 'restored', 'restore_failed'], true)) {
+            return response()->json([
+                'data' => null,
+                'message' => 'Backup is not in a restorable state',
                 'errors' => null,
             ], 400);
         }

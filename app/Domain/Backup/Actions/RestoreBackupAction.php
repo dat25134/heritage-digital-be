@@ -18,8 +18,12 @@ class RestoreBackupAction
         }
 
         // Validate backup is completed
-        if ($backup->status !== 'completed') {
-            throw new \RuntimeException('Can only restore completed backups');
+        // Allow restore when status in [completed, restored, restore_failed]; block when restoring
+        if ($backup->status === 'restoring') {
+            throw new \RuntimeException('Restore already in progress for this backup');
+        }
+        if (!in_array($backup->status, ['completed', 'restored', 'restore_failed'], true)) {
+            throw new \RuntimeException('Backup is not in a restorable state');
         }
 
         // Validate confirmation token
